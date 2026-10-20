@@ -17,10 +17,6 @@ Ein elegantes Tool zur Verwaltung und Anzeige von Release Notes direkt in Home A
 - 🖱️ **Drag'n'Drop** - Einträge im Admin-Interface zwischen "Neue Features" und "Änderungen/Bugfixes" verschieben und innerhalb eines Bereichs umsortieren
 - 🔄 **Automatische Update-Dokumentation** - Beobachtet alle `update.*`-Entitäten der Instanz und legt bei abgeschlossenen Updates sowie neu hinzugekommenen/entfernten Integrationen automatisch passende Release-Notes-Einträge an (ein-/ausschaltbar in den Einstellungen)
 
-**⚠️ Umstieg von der iframe-Card (bis v0.6.x)**
-
-Das Dashboard-Widget ist ab v0.7.0 eine eigene Karte, die alte Widget-Seite (`release-notes-widget.html`) gibt es nicht mehr. Ersetze die bisherige iframe-Card durch `type: custom:release-notes-card` (siehe [Konfiguration](#️-konfiguration)). Der `?=vX.X.X`-Parameter in den URLs wird nicht mehr benötigt.
-
 ## 🆕 Version 0.7.0
 
 ### ⚠️ Breaking Change
