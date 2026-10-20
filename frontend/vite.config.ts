@@ -1,0 +1,26 @@
+import { defineConfig } from "vite";
+import { resolve } from "node:path";
+
+// Builds the dashboard card into a single self-contained bundle.
+// The output is committed so HACS ships it without a Node toolchain.
+// No runtime dependency may be external: Lit is compiled into the bundle.
+export default defineConfig({
+  define: {
+    "process.env.NODE_ENV": '"production"',
+  },
+  build: {
+    lib: {
+      entry: resolve(__dirname, "src/main.ts"),
+      formats: ["es"],
+      fileName: () => "release-notes-card.js",
+    },
+    outDir: resolve(__dirname, "../custom_components/release_notes_manager/frontend"),
+    emptyOutDir: false,
+    rollupOptions: {
+      external: [],
+    },
+    target: "es2022",
+    minify: "esbuild",
+    sourcemap: false,
+  },
+});

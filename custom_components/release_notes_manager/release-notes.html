@@ -4,47 +4,99 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <meta id="version-meta" name="version" content="0.6.1">
+  <meta id="version-meta" name="version" content="0.7.0">
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home Assistant Release Notes Manager - Admin v0.6.1</title>
+  <title>Home Assistant Release Notes Manager - Admin v0.7.0</title>
   <style>
+    /* Farben: Standardwerte des HA-Themes (hell/dunkel). Im HA-iframe überschreibt
+       applyTheme() sie mit den Werten des aktiven HA-Themes. */
+    :root {
+      --primary-background-color: #fafafa;
+      --card-background-color: #ffffff;
+      --primary-text-color: #212121;
+      --secondary-text-color: #727272;
+      --divider-color: rgba(0, 0, 0, 0.12);
+      --primary-color: #03a9f4;
+      --text-primary-color: #ffffff;
+      --success-color: #43a047;
+      --warning-color: #ffa600;
+      --error-color: #db4437;
+      --info-color: #039be5;
+      --rn-card: var(--ha-card-background, var(--card-background-color));
+      --rn-radius: var(--ha-card-border-radius, 12px);
+      --rn-shadow: var(--ha-card-box-shadow, 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2));
+      --rn-card-border: transparent;
+      --rn-head-bg: color-mix(in srgb, var(--primary-text-color) 4%, transparent);
+      --rn-input-border: color-mix(in srgb, var(--primary-text-color) 28%, transparent);
+      --rn-scrim: rgba(0, 0, 0, 0.32);
+      --rn-success-text: color-mix(in srgb, var(--success-color) 65%, var(--primary-text-color));
+
+      /* Kategorie-Farben (hell) - Hintergrund/Schrift, Kontrast >= 4,5:1 */
+      --lbl-white-bg: #ffffff; --lbl-white-fg: #202124; --lbl-white-bd: #bfc3c9;
+      --lbl-gray-bg: #e8eaed; --lbl-gray-fg: #3c4043;
+      --lbl-black-bg: #2b2d31; --lbl-black-fg: #ffffff;
+      --lbl-red-bg: #fde2e1; --lbl-red-fg: #a3221b;
+      --lbl-orange-bg: #ffe8d4; --lbl-orange-fg: #9a3d0a;
+      --lbl-yellow-bg: #fdf1c4; --lbl-yellow-fg: #6f4a00;
+      --lbl-green-bg: #dcf3e3; --lbl-green-fg: #1b6b36;
+      --lbl-blue-light-bg: #d6e9fc; --lbl-blue-light-fg: #144f8a;
+      --lbl-blue-dark-bg: #1f5fbf; --lbl-blue-dark-fg: #ffffff;
+      --lbl-purple-bg: #efe3fb; --lbl-purple-fg: #6a2ba3;
+      --lbl-pink-bg: #fce1ee; --lbl-pink-fg: #9b1d57;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --primary-background-color: #111111;
+        --card-background-color: #1c1c1c;
+        --primary-text-color: #e1e1e1;
+        --secondary-text-color: #9b9b9b;
+        --divider-color: rgba(225, 225, 225, 0.12);
+        --rn-card-border: var(--divider-color);
+        --rn-scrim: rgba(0, 0, 0, 0.6);
+        --lbl-white-bg: transparent; --lbl-white-fg: #f1f3f4; --lbl-white-bd: #6b6f76;
+        --lbl-gray-bg: #3a3d42; --lbl-gray-fg: #dfe1e5;
+        --lbl-black-bg: #e6e7e9; --lbl-black-fg: #141516;
+        --lbl-red-bg: #4a1f1f; --lbl-red-fg: #ffb3ad;
+        --lbl-orange-bg: #4a2a14; --lbl-orange-fg: #ffc28f;
+        --lbl-yellow-bg: #463a10; --lbl-yellow-fg: #f5d66b;
+        --lbl-green-bg: #173d26; --lbl-green-fg: #8fdcaa;
+        --lbl-blue-light-bg: #18344f; --lbl-blue-light-fg: #9ccbfa;
+        --lbl-blue-dark-bg: #2f6fd0; --lbl-blue-dark-fg: #ffffff;
+        --lbl-purple-bg: #362151; --lbl-purple-fg: #d7b8fb;
+        --lbl-pink-bg: #4a1b33; --lbl-pink-fg: #ffb0d4;
+        color-scheme: dark;
+      }
+    }
+    /* Gleiche Werte wie oben, damit der manuelle Schalter / das HA-Theme in beide Richtungen greift */
+    :root[data-theme="dark"] {
+      --primary-background-color: #111111;
+      --card-background-color: #1c1c1c;
+      --primary-text-color: #e1e1e1;
+      --secondary-text-color: #9b9b9b;
+      --divider-color: rgba(225, 225, 225, 0.12);
+      --rn-card-border: var(--divider-color);
+      --rn-scrim: rgba(0, 0, 0, 0.6);
+      --lbl-white-bg: transparent; --lbl-white-fg: #f1f3f4; --lbl-white-bd: #6b6f76;
+      --lbl-gray-bg: #3a3d42; --lbl-gray-fg: #dfe1e5;
+      --lbl-black-bg: #e6e7e9; --lbl-black-fg: #141516;
+      --lbl-red-bg: #4a1f1f; --lbl-red-fg: #ffb3ad;
+      --lbl-orange-bg: #4a2a14; --lbl-orange-fg: #ffc28f;
+      --lbl-yellow-bg: #463a10; --lbl-yellow-fg: #f5d66b;
+      --lbl-green-bg: #173d26; --lbl-green-fg: #8fdcaa;
+      --lbl-blue-light-bg: #18344f; --lbl-blue-light-fg: #9ccbfa;
+      --lbl-blue-dark-bg: #2f6fd0; --lbl-blue-dark-fg: #ffffff;
+      --lbl-purple-bg: #362151; --lbl-purple-fg: #d7b8fb;
+      --lbl-pink-bg: #4a1b33; --lbl-pink-fg: #ffb0d4;
+      color-scheme: dark;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; background: #f9fafb; color: #111827; }
+    body { font-family: var(--primary-font-family, Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen, Ubuntu, Cantarell, sans-serif); font-size: 14px; line-height: 1.45; background: var(--primary-background-color); color: var(--primary-text-color); }
+
+    /* Layout-Utilities */
     .min-h-screen { min-height: 100vh; }
-    .bg-gray-50 { background-color: #f9fafb; }
-    .bg-gray-100 { background-color: #f3f4f6; }
-    .bg-gray-200 { background-color: #e5e7eb; }
-    .bg-white { background-color: #ffffff; }
-    .bg-blue-600 { background-color: #2563eb; }
-    .bg-green-50 { background-color: #f0fdf4; }
-    .bg-green-100 { background-color: #dcfce7; }
-    .bg-green-600 { background-color: #16a34a; }
-    .bg-red-100 { background-color: #fee2e2; }
-    .bg-red-600 { background-color: #dc2626; }
-    .bg-yellow-50 { background-color: #fefce8; }
-    .bg-yellow-100 { background-color: #fef9c3; }
-    .bg-yellow-600 { background-color: #ca8a04; }
-    .bg-orange-100 { background-color: #ffedd5; }
-    .bg-purple-100 { background-color: #f3e8ff; }
-    .bg-pink-100 { background-color: #fce7f3; }
-    .text-white { color: #ffffff; }
-    .text-gray-500 { color: #6b7280; }
-    .text-gray-600 { color: #4b5563; }
-    .text-gray-700 { color: #374151; }
-    .text-gray-800 { color: #1f2937; }
-    .text-red-600 { color: #dc2626; }
-    .text-blue-600 { color: #2563eb; }
-    .text-green-600 { color: #16a34a; }
-    .text-green-700 { color: #15803d; }
-    .text-green-800 { color: #166534; }
-    .text-orange-800 { color: #9a3412; }
-    .text-purple-800 { color: #6b21a8; }
-    .text-pink-800 { color: #9f1239; }
-    .text-yellow-600 { color: #ca8a04; }
-    .border-green-200 { border-color: #bbf7d0; }
-    .border-yellow-200 { border-color: #fef08a; }
     .p-3 { padding: 0.75rem; }
     .p-4 { padding: 1rem; }
     .p-6 { padding: 1.5rem; }
@@ -54,257 +106,325 @@
     .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
     .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
     .py-6 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+    .py-12 { padding-top: 3rem; padding-bottom: 3rem; }
     .pt-4 { padding-top: 1rem; }
     .mb-2 { margin-bottom: 0.5rem; }
     .mb-3 { margin-bottom: 0.75rem; }
     .mb-4 { margin-bottom: 1rem; }
     .mb-6 { margin-bottom: 1.5rem; }
+    .mt-1 { margin-top: 0.25rem; }
+    .mt-2 { margin-top: 0.5rem; }
     .mt-3 { margin-top: 0.75rem; }
-    .max-w-6xl { max-width: 72rem; margin-left: auto; margin-right: auto; }
+    .mt-4 { margin-top: 1rem; }
     .flex { display: flex; }
-    .flex-1 { flex: 1; }
+    .flex-1 { flex: 1; min-width: 0; }
     .gap-2 { gap: 0.5rem; }
     .gap-3 { gap: 0.75rem; }
+    .gap-4 { gap: 1rem; }
     .items-center { align-items: center; }
     .items-start { align-items: flex-start; }
+    .items-stretch { align-items: stretch; }
     .justify-between { justify-content: space-between; }
-    .rounded { border-radius: 0.25rem; }
-    .rounded-lg { border-radius: 0.5rem; }
-    .border { border: 1px solid #e5e7eb; }
-    .border-t { border-top: 1px solid #e5e7eb; }
-    .border-b { border-bottom: 1px solid #e5e7eb; }
-    .shadow { box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1); }
+    .justify-end { justify-content: flex-end; }
+    .rounded { border-radius: 8px; }
+    .border { border: 1px solid var(--divider-color); }
+    .border-t { border-top: 1px solid var(--divider-color); }
+    .border-b { border-bottom: 1px solid var(--divider-color); }
+    .text-xs { font-size: 0.75rem; line-height: 1rem; }
     .text-sm { font-size: 0.875rem; }
+    .text-base { font-size: 1rem; }
+    .text-lg { font-size: 1.1rem; }
     .text-xl { font-size: 1.25rem; }
     .text-2xl { font-size: 1.5rem; }
     .font-bold { font-weight: 700; }
     .font-semibold { font-weight: 600; }
     .font-medium { font-weight: 500; }
+    .font-mono { font-family: ui-monospace, Consolas, monospace; }
     .italic { font-style: italic; }
     .line-through { text-decoration: line-through; }
+    .text-center { text-align: center; }
     .w-full { width: 100%; }
+    .min-w-12 { min-width: 3rem; }
     .block { display: block; }
     .hidden { display: none; }
     .cursor-pointer { cursor: pointer; }
+    .preserve-linebreaks { white-space: pre-wrap; word-wrap: break-word; }
     .space-y-2 > * + * { margin-top: 0.5rem; }
     .space-y-3 > * + * { margin-top: 0.75rem; }
-    button { border: none; cursor: pointer; transition: all 0.15s; font-size: 0.875rem; }
-    button:hover.bg-blue-600 { background-color: #1d4ed8; }
-    button:hover.bg-green-600 { background-color: #15803d; }
-    button:hover.bg-green-100 { background-color: #bbf7d0; }
-    button:hover.bg-red-600 { background-color: #b91c1c; }
-    button:hover.bg-red-100 { background-color: #fecaca; }
-    button:hover.bg-yellow-600 { background-color: #a16207; }
-    button:hover.bg-yellow-100 { background-color: #fef08a; }
-    button:hover.bg-gray-200 { background-color: #d1d5db; }
-    input, select, textarea { border: 1px solid #d1d5db; font-size: 0.875rem; font-family: inherit; }
-    input:focus, select:focus, textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-    textarea { resize: vertical; }
-    .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: none; align-items: center; justify-content: center; z-index: 50; padding: 1rem; }
-    .modal.active { display: flex; }
-    .modal-content { background: white; border-radius: 0.5rem; max-width: 56rem; width: 100%; max-height: 90vh; overflow-y: auto; }
     .grid { display: grid; }
     .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .ha-logo { height: 32px; width: 32px; }
-    .header-title { display: flex; align-items: center; gap: 12px; }
-  
-    .bg-gray-800 { background-color: #1f2937; }
-    .bg-gray-900 { background-color: #111827; }
-    .bg-blue-100 { background-color: #dbeafe; }
-    .bg-blue-200 { background-color: #bfdbfe; }
-    .text-gray-800 { color: #1f2937; }
-    .text-gray-900 { color: #111827; }
-    .text-blue-800 { color: #1e40af; }
-    .text-blue-900 { color: #1e3a8a; }
-    .text-red-800 { color: #991b1b; }
-    .text-orange-800 { color: #9a3412; }
-    .text-yellow-900 { color: #713f12; }
-    .text-green-800 { color: #166534; }
-    .text-purple-800 { color: #6b21a8; }
-    .text-pink-800 { color: #9f1239; }
-    .border-gray-300 { border-color: #d1d5db; }
+    .text-gray-500, .text-gray-600, .text-gray-700 { color: var(--secondary-text-color); }
+    .text-green-700, .text-green-800 { color: var(--rn-success-text); }
 
-    .w-40 { width: 8rem; hyphens: auto; -webkit-hyphens: auto; -ms-hyphens: auto; word-wrap: break-word; }
-    .text-center { text-align: center; }
-    .pl-3 { padding-left: 0.75rem; }
+    /* Seite */
+    .app { max-width: 72rem; margin: 0 auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+    .card { background: var(--rn-card); border-radius: var(--rn-radius); box-shadow: var(--rn-shadow); border: 1px solid var(--rn-card-border); overflow: hidden; }
+    .toolbar { padding: 0.875rem 1rem; display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+    .toolbar-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+    .header-title { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .ha-logo { height: 32px; width: 32px; flex-shrink: 0; color: var(--primary-color); }
+    .app-title { font-size: 1.25rem; font-weight: 500; }
+    .save-status { font-size: 0.8rem; color: var(--secondary-text-color); min-height: 1em; }
+    .filters { display: flex; gap: 0.5rem; padding: 0 1rem 0.875rem; flex-wrap: wrap; }
+    .filters input { flex: 1 1 12rem; min-width: 0; }
+    .settings-panel { border-top: 1px solid var(--divider-color); border-bottom: 1px solid var(--divider-color); padding: 1rem; margin-bottom: 0.875rem; background: var(--rn-head-bg); }
+    .settings-row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    .settings-row + .settings-row { margin-top: 0.75rem; }
+    .version-footer { position: fixed; bottom: 10px; left: 10px; font-size: 11px; color: var(--secondary-text-color); font-family: ui-monospace, Consolas, monospace; z-index: 1000; }
 
-    /* Neuestes Release - NUR der Header-Bereich blau */
-    #releases-container > div:first-child > div.p-4.flex.justify-between {
-      background-color: #2563eb !important;
-      border-radius: 0.5rem 0.5rem 0 0;
-    }
-    #releases-container > div:first-child > div.p-4.flex.justify-between h2 {
-      color: #ffffff !important;
-    }
-    #releases-container > div:first-child > div.p-4.flex.justify-between p {
-      color: #ffffff !important;
-    }
-    .mt-8 { margin-top: 2rem; }
+    /* Eingaben und Buttons (Stil wie in ha_ev-charge-record) */
+    input, select, textarea { font: inherit; font-size: 0.875rem; color: var(--primary-text-color); background: var(--rn-card); border: 1px solid var(--rn-input-border); border-radius: 8px; }
+    input, select { padding: 0.45rem 0.65rem; }
+    textarea { resize: vertical; padding: 0.45rem 0.65rem; }
+    input[type="checkbox"], input[type="range"] { padding: 0; accent-color: var(--primary-color); }
+    input::placeholder, textarea::placeholder { color: var(--secondary-text-color); }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 20%, transparent); }
+    button { font: inherit; font-size: 0.875rem; cursor: pointer; transition: background-color 0.15s, color 0.15s, border-color 0.15s; }
+    button:focus-visible, [role="button"]:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+    .btn { padding: 0.4rem 0.9rem; background: transparent; border: 1px solid var(--primary-color); border-radius: 8px; color: var(--primary-color); white-space: nowrap; }
+    .btn:hover { background: color-mix(in srgb, var(--primary-color) 10%, transparent); }
+    .btn-sm { padding: 0.25rem 0.7rem; font-size: 0.8rem; }
+    .btn-primary { background: var(--primary-color); color: var(--text-primary-color); font-weight: 500; }
+    .btn-primary:hover { background: color-mix(in srgb, var(--primary-color) 85%, #000); }
+    .btn-danger { border-color: var(--error-color); color: var(--error-color); }
+    .btn-danger:hover { background: color-mix(in srgb, var(--error-color) 10%, transparent); }
+    .btn-success { border-color: var(--success-color); color: var(--rn-success-text); }
+    .btn-success:hover { background: color-mix(in srgb, var(--success-color) 12%, transparent); }
+    .btn-icon { width: 34px; height: 34px; flex-shrink: 0; display: inline-grid; place-items: center; border: 0; border-radius: 50%; background: transparent; color: var(--secondary-text-color); font-size: 1.1rem; line-height: 1; }
+    .btn-icon:hover { background: var(--rn-head-bg); color: var(--primary-text-color); }
+    .btn-icon svg { width: 20px; height: 20px; }
+    .btn-icon-danger:hover { color: var(--error-color); }
+    .seg { display: inline-flex; border: 1px solid var(--rn-input-border); border-radius: 8px; padding: 2px; gap: 2px; }
+    .seg button { padding: 0.3rem 0.8rem; border: 0; border-radius: 6px; background: transparent; color: var(--secondary-text-color); }
+    .seg button[aria-pressed="true"] { background: var(--primary-color); color: var(--text-primary-color); }
 
-    /* Stelle sicher dass rounded-lg wirkt */
-    #releases-container > div:first-child {
-      overflow: hidden;
-    }
-    .bg-blue-500 { background-color: #3b82f6; }
-    .bg-yellow-500 { background-color: #eab308; }
-    .text-black { color: #000000; }
-    .text-xs { font-size: 0.75rem; line-height: 1rem; }
+    /* Chips (Zusammenfassung, Status) */
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 500; line-height: 1.3; white-space: nowrap; background: color-mix(in srgb, var(--chip-color, var(--primary-color)) 20%, transparent); color: var(--primary-text-color); }
+    .chip-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--chip-color); }
+    .chip-features { --chip-color: var(--success-color); }
+    .chip-changes { --chip-color: var(--info-color); }
+    .chip-issues { --chip-color: var(--warning-color); }
+    .chip-done { --chip-color: var(--success-color); }
+    .chip-now { --chip-color: var(--primary-color); }
 
-    /* Badges mit Grid - absolut zentriert */
-    .release-badges {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      display: grid;
-      grid-template-columns: 90px 110px 80px;
-      gap: 0.5rem;
-      align-items: center;
-    }
-    .release-header-wrapper {
-      display: block;
-    }
-    .release-top-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 0.5rem;
-    }
-    .release-bottom-row {
-      position: relative;
-      display: flex;
-      align-items: center;
-      min-height: 2rem;
-      margin-top: 0.25rem;
-    }
+    /* Kategorie-Labels: Farbe kommt über die Farb-ID (.lbl-<id>) aus den Theme-Tokens */
+    .lbl { display: inline-block; width: 8rem; flex-shrink: 0; text-align: center; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.8rem; font-weight: 500; line-height: 1.35; background: var(--lbl-bg); color: var(--lbl-fg); border: 1px solid var(--lbl-bd, transparent); hyphens: auto; -webkit-hyphens: auto; overflow-wrap: anywhere; }
+    .lbl-white { --lbl-bg: var(--lbl-white-bg); --lbl-fg: var(--lbl-white-fg); --lbl-bd: var(--lbl-white-bd); }
+    .lbl-gray { --lbl-bg: var(--lbl-gray-bg); --lbl-fg: var(--lbl-gray-fg); }
+    .lbl-black { --lbl-bg: var(--lbl-black-bg); --lbl-fg: var(--lbl-black-fg); }
+    .lbl-red { --lbl-bg: var(--lbl-red-bg); --lbl-fg: var(--lbl-red-fg); }
+    .lbl-orange { --lbl-bg: var(--lbl-orange-bg); --lbl-fg: var(--lbl-orange-fg); }
+    .lbl-yellow { --lbl-bg: var(--lbl-yellow-bg); --lbl-fg: var(--lbl-yellow-fg); }
+    .lbl-green { --lbl-bg: var(--lbl-green-bg); --lbl-fg: var(--lbl-green-fg); }
+    .lbl-blue-light { --lbl-bg: var(--lbl-blue-light-bg); --lbl-fg: var(--lbl-blue-light-fg); }
+    .lbl-blue-dark { --lbl-bg: var(--lbl-blue-dark-bg); --lbl-fg: var(--lbl-blue-dark-fg); }
+    .lbl-purple { --lbl-bg: var(--lbl-purple-bg); --lbl-fg: var(--lbl-purple-fg); }
+    .lbl-pink { --lbl-bg: var(--lbl-pink-bg); --lbl-fg: var(--lbl-pink-fg); }
+    .lbl-pick { cursor: pointer; }
+    .lbl-pick:hover { filter: brightness(0.95); }
+    .color-picker { display: grid; grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr)); gap: 0.5rem; padding: 0.75rem; margin: -0.25rem 0 0.5rem; border: 1px solid var(--divider-color); border-radius: 10px; background: var(--rn-head-bg); }
+    .color-picker button { padding: 0; border: 0; background: none; border-radius: 6px; }
+    .color-picker button[aria-pressed="true"] .lbl { outline: 2px solid var(--primary-color); outline-offset: 2px; }
 
-    .release-title {
-      white-space: nowrap;
-    }
+    /* Release-Karten */
+    .releases { display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem; }
+    .release-head { position: relative; padding: 0.875rem 2.75rem 0.875rem 1rem; display: flex; flex-direction: column; gap: 0.5rem; cursor: pointer; }
+    .release-head::after { content: ""; position: absolute; top: 50%; right: 18px; width: 7px; height: 7px; margin-top: -6px; border-right: 2px solid var(--secondary-text-color); border-bottom: 2px solid var(--secondary-text-color); transform: rotate(45deg); }
+    .release.open .release-head::after { margin-top: -2px; transform: rotate(-135deg); }
+    .release-title-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.25rem 0.75rem; }
+    .release-title { font-size: 1.1rem; font-weight: 500; min-width: 0; overflow-wrap: anywhere; }
+    .release-meta { display: flex; align-items: center; gap: 0.25rem; }
+    .release-date { color: var(--secondary-text-color); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .release-body { border-top: 1px solid var(--divider-color); padding: 0.375rem 1rem 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+    .group-title, .section-title { font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--secondary-text-color); }
+    .group-title { margin: 0.625rem 0 0.25rem; }
+    .items { list-style: none; }
+    .items > li + li { border-top: 1px solid var(--divider-color); }
+    .items.issues { display: flex; flex-direction: column; gap: 0.5rem; }
+    .items.issues > li + li { border-top: 0; }
+    .item { display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.5rem 0; }
+    .item.issue { padding: 0.5rem 0.625rem; border-radius: 10px; background: color-mix(in srgb, var(--warning-color) 10%, var(--rn-card)); border: 1px solid color-mix(in srgb, var(--warning-color) 40%, transparent); }
+    .item-main { flex: 1; min-width: 0; }
+    .item-title { font-weight: 500; overflow-wrap: anywhere; }
+    .item-toggle { position: relative; display: block; width: 100%; text-align: left; padding: 0 1.75rem 0 0; border: 0; background: none; color: inherit; font-weight: 500; font-size: inherit; overflow-wrap: anywhere; }
+    .item-toggle::after { content: ""; position: absolute; top: 50%; right: 6px; width: 6px; height: 6px; margin-top: -5px; border-right: 2px solid var(--secondary-text-color); border-bottom: 2px solid var(--secondary-text-color); transform: rotate(45deg); }
+    .item-toggle.open::after { margin-top: -1px; transform: rotate(-135deg); }
+    .item-details { margin-top: 0.375rem; padding: 0.5rem 0.75rem; border-radius: 8px; background: var(--rn-head-bg); color: var(--secondary-text-color); font-size: 0.875rem; overflow-wrap: anywhere; }
+    .item-resolution { margin-top: 0.25rem; color: var(--secondary-text-color); font-size: 0.875rem; }
+    .item .chips { margin-top: 0.25rem; }
+    .note { padding: 0.625rem 0.75rem; border-radius: 8px; background: var(--rn-head-bg); color: var(--secondary-text-color); font-size: 0.875rem; }
+    .more { text-align: center; padding: 0.25rem 0 0.5rem; }
+    .empty { text-align: center; padding: 3rem 1rem; color: var(--secondary-text-color); }
+    .empty-title { font-size: 1.25rem; font-weight: 500; margin-bottom: 0.5rem; color: var(--primary-text-color); }
 
-    /* Feste Breiten für Badge-Typen */
-    .badge-features {
-      min-width: 90px;
-      text-align: center;
-    }
-    .badge-changes {
-      min-width: 110px;
-      text-align: center;
-    }
-    .badge-issues {
-      min-width: 80px;
-      text-align: center;
-    }
+    /* Dialoge */
+    .modal { position: fixed; inset: 0; background: var(--rn-scrim); display: none; align-items: center; justify-content: center; z-index: 50; padding: 1rem; }
+    .modal.active { display: flex; }
+    .modal-content { background: var(--rn-card); color: var(--primary-text-color); border-radius: var(--rn-radius); border: 1px solid var(--rn-card-border); max-width: 56rem; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28); }
+    .dialog-title { font-size: 1.25rem; font-weight: 500; }
+    .section-title { margin: 0; align-self: center; }
+    .edit-row { border: 1px solid var(--divider-color); border-radius: 10px; padding: 0.625rem; margin-bottom: 0.75rem; background: var(--rn-head-bg); }
+    .edit-row-issue { background: color-mix(in srgb, var(--warning-color) 10%, var(--rn-card)); border-color: color-mix(in srgb, var(--warning-color) 40%, transparent); }
+    .edit-row-done { background: color-mix(in srgb, var(--success-color) 10%, var(--rn-card)); border-color: color-mix(in srgb, var(--success-color) 40%, transparent); }
+    .notice { padding: 0.75rem; border-radius: 10px; background: color-mix(in srgb, var(--warning-color) 12%, var(--rn-card)); border: 1px solid color-mix(in srgb, var(--warning-color) 40%, transparent); }
+    .panel { border: 1px solid var(--divider-color); border-radius: 10px; padding: 1rem; }
+    .panel-title { font-size: 1rem; font-weight: 500; margin-bottom: 0.5rem; }
+    .cat-row { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap; padding: 0.625rem 0.75rem; border: 1px solid var(--divider-color); border-radius: 10px; margin-bottom: 0.5rem; }
 
-    /* Feature 8: Neuestes Release - nur Header blau */
-    #releases-container > div:first-child {
-      overflow: hidden;
-    }
-    #releases-container > div:first-child > .release-header-wrapper {
-      background-color: #2563eb !important;
-    }
-    #releases-container > div:first-child > .release-header-wrapper h2 {
-      color: #ffffff !important;
-    }
-    #releases-container > div:first-child > .release-header-wrapper p {
-      color: #ffffff !important;
-    }
-    #releases-container > div:first-child > .release-header-wrapper button {
-      background-color: rgba(255, 255, 255, 0.2) !important;
-    }
-
-    .drag-handle { cursor: grab; padding: 0 0.25rem; color: #9ca3af; -webkit-user-select: none; user-select: none; display: flex; align-items: center; font-size: 1rem; }
+    /* Drag'n'Drop im Release-Dialog */
+    .drag-handle { cursor: grab; padding: 0 0.25rem; color: var(--secondary-text-color); -webkit-user-select: none; user-select: none; display: flex; align-items: center; font-size: 1rem; }
     .drag-handle:active { cursor: grabbing; }
     .item-card.dragging { opacity: 0.4; }
-    .drop-zone.drag-over { background-color: #eff6ff; outline: 2px dashed #3b82f6; outline-offset: -4px; border-radius: 0.375rem; }
-    .item-card.drop-before { box-shadow: 0 -3px 0 0 #3b82f6; }
-    .item-card.drop-after { box-shadow: 0 3px 0 0 #3b82f6; }
-</style>
+    .drop-zone.drag-over { background-color: color-mix(in srgb, var(--primary-color) 8%, transparent); outline: 2px dashed var(--primary-color); outline-offset: -4px; border-radius: 8px; }
+    .item-card.drop-before { box-shadow: 0 -3px 0 0 var(--primary-color); }
+    .item-card.drop-after { box-shadow: 0 3px 0 0 var(--primary-color); }
+
+    @media (max-width: 600px) {
+      .app { padding: 1rem; }
+      .grid-cols-2 { grid-template-columns: 1fr; }
+      .lbl { width: 6.5rem; }
+    }
+    @media (prefers-reduced-motion: reduce) { button { transition: none; } }
+  </style>
 </head>
-<body class="min-h-screen bg-gray-50">
-  <div id="app" class="py-6">
-    <div class="max-w-6xl px-6">
-      <div class="bg-white shadow rounded-lg">
-        <div class="p-4 border-b flex justify-between items-center">
-          <div class="header-title">
-            <svg class="ha-logo" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-              <path fill="#41BDF5" d="M42 18L24 6 6 18v24h36V18zM24 10l14 9v19H10V19l14-9z"/>
-              <circle fill="#FFFFFF" cx="15" cy="35" r="2"/>
-              <circle fill="#FFFFFF" cx="24" cy="20" r="2"/>
-              <circle fill="#FFFFFF" cx="33" cy="30" r="2"/>
-              <path stroke="#FFFFFF" stroke-width="2" fill="none" d="M15 35 L24 20 M24 20 L33 30"/>
-            </svg>
-            <div>
-              <h1 class="text-2xl font-bold">Home Assistant Release Notes Manager</h1>
-              <p class="text-sm text-gray-500" id="save-status"></p>
-            </div>
-          </div>
-          <div class="flex gap-3">
-            <button class="px-4 py-2 bg-gray-200 rounded" onclick="showCategoriesManager()">⚙️ Kategorien</button>
-            <input type="file" id="import-file-input" accept="application/json" style="display:none" onchange="handleImportFile(event)"/>
-            <button class="px-4 py-2 bg-gray-200 rounded" onclick="showSettings()">🔧 Einstellungen</button>
-            <button class="px-4 py-2 bg-blue-600 text-white rounded" onclick="createNewRelease()">+ Neues Release</button>
+<body>
+  <div id="app" class="app">
+    <div class="card">
+      <div class="toolbar">
+        <div class="header-title">
+          <svg class="ha-logo" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21.8,13H20V21H13V17.67L15.79,14.88L16.5,15C17.66,15 18.6,14.06 18.6,12.9C18.6,11.74 17.66,10.8 16.5,10.8A2.1,2.1 0 0,0 14.4,12.9L14.5,13.61L13,15.13V9.65C13.66,9.29 14.1,8.6 14.1,7.8A2.1,2.1 0 0,0 12,5.7A2.1,2.1 0 0,0 9.9,7.8C9.9,8.6 10.34,9.29 11,9.65V15.13L9.5,13.61L9.6,12.9A2.1,2.1 0 0,0 7.5,10.8A2.1,2.1 0 0,0 5.4,12.9A2.1,2.1 0 0,0 7.5,15L8.21,14.88L11,17.67V21H4V13H2.25C1.83,13 1.42,13 1.42,12.79C1.43,12.57 1.85,12.15 2.28,11.72L11,3C11.33,2.67 11.67,2.33 12,2.33C12.33,2.33 12.67,2.67 13,3L17,7V6H19V9L21.78,11.78C22.18,12.18 22.59,12.59 22.6,12.8C22.6,13 22.2,13 21.8,13M7.5,12A0.9,0.9 0 0,1 8.4,12.9A0.9,0.9 0 0,1 7.5,13.8A0.9,0.9 0 0,1 6.6,12.9A0.9,0.9 0 0,1 7.5,12M16.5,12C17,12 17.4,12.4 17.4,12.9C17.4,13.4 17,13.8 16.5,13.8A0.9,0.9 0 0,1 15.6,12.9A0.9,0.9 0 0,1 16.5,12M12,6.9C12.5,6.9 12.9,7.3 12.9,7.8C12.9,8.3 12.5,8.7 12,8.7C11.5,8.7 11.1,8.3 11.1,7.8C11.1,7.3 11.5,6.9 12,6.9Z"/></svg>
+          <div>
+            <h1 class="app-title">Home Assistant Release Notes Manager</h1>
+            <p class="save-status" id="save-status"></p>
           </div>
         </div>
-        <div class="p-4 border-b flex gap-3">
-          <input type="text" id="search-input" placeholder="Suchen..." class="flex-1 px-3 py-2 rounded"/>
-          <select id="category-filter" class="px-3 py-2 rounded"><option value="all">Alle Kategorien</option></select>
-          <button class="px-4 py-2 bg-gray-200 rounded" onclick="loadData()">🔄 Aktualisieren</button>
+        <div class="toolbar-actions">
+          <button class="btn" onclick="showCategoriesManager()">Kategorien</button>
+          <input type="file" id="import-file-input" accept="application/json" style="display:none" onchange="handleImportFile(event)"/>
+          <button class="btn" onclick="showSettings()">Einstellungen</button>
+          <button class="btn btn-primary" onclick="createNewRelease()">+ Neues Release</button>
         </div>
       </div>
-      <div id="releases-container" class="mt-8"><div class="text-center py-12 text-gray-500">Lade Releases...</div></div>
+      <div class="filters">
+        <input type="text" id="search-input" placeholder="Suchen..." aria-label="Suchen"/>
+        <select id="category-filter" aria-label="Kategorie"><option value="all">Alle Kategorien</option></select>
+        <button class="btn" onclick="loadData()">Aktualisieren</button>
+      </div>
     </div>
+    <div id="releases-container" class="releases"><div class="empty">Lade Releases...</div></div>
   </div>
   <div id="modal" class="modal"><div class="modal-content p-6"></div></div>
   <script>
+// Kategorie-Farben: gespeichert wird nur die Farb-ID, das Aussehen je Theme steht im CSS (.lbl-<id>)
 const CATEGORY_COLORS = [
-  {id: 'white', label: 'Weiß', class: 'bg-white text-gray-900 border border-gray-300'},
-  {id: 'gray', label: 'Grau', class: 'bg-gray-200 text-gray-800'},
-  {id: 'black', label: 'Schwarz', class: 'bg-gray-800 text-white'},
-  {id: 'red', label: 'Rot', class: 'bg-red-100 text-red-800'},
-  {id: 'orange', label: 'Orange', class: 'bg-orange-100 text-orange-800'},
-  {id: 'yellow', label: 'Gelb', class: 'bg-yellow-100 text-yellow-900'},
-  {id: 'green', label: 'Grün', class: 'bg-green-100 text-green-800'},
-  {id: 'blue-light', label: 'Hellblau', class: 'bg-blue-200 text-blue-900'},
-  {id: 'blue-dark', label: 'Dunkelblau', class: 'bg-blue-600 text-white'},
-  {id: 'purple', label: 'Lila', class: 'bg-purple-100 text-purple-800'},
-  {id: 'pink', label: 'Pink', class: 'bg-pink-100 text-pink-800'}
+  {id: 'white', label: 'Weiß'},
+  {id: 'gray', label: 'Grau'},
+  {id: 'black', label: 'Schwarz'},
+  {id: 'red', label: 'Rot'},
+  {id: 'orange', label: 'Orange'},
+  {id: 'yellow', label: 'Gelb'},
+  {id: 'green', label: 'Grün'},
+  {id: 'blue-light', label: 'Hellblau'},
+  {id: 'blue-dark', label: 'Dunkelblau'},
+  {id: 'purple', label: 'Lila'},
+  {id: 'pink', label: 'Pink'}
 ];
+const COLOR_IDS = new Set(CATEGORY_COLORS.map(c => c.id));
 
-const state={releases:[],knownIssues:[],categories:[{id:'general',label:'Allgemein',color:'bg-gray-200 text-gray-800'},{id:'heating',label:'Heizung',color:'bg-orange-100 text-orange-800'},{id:'energy',label:'Energie',color:'bg-green-100 text-green-800'},{id:'automation',label:'Automation',color:'bg-blue-600 text-white'},{id:'device',label:'Gerät',color:'bg-purple-100 text-purple-800'},{id:'integration',label:'Integration',color:'bg-pink-100 text-pink-800'}],settings:{autoUpdateDocs:true},expandedReleases:new Set(),expandedDetails:new Set(),displayCount:10,searchTerm:'',filterCategory:'all',editingRelease:null,editingCatId:null,editingCatLabel:'',resolvingIssueId:null,resolvingSolution:'',resolveVersion:''};
-function formatDateDE(d){if(!d)return'';const[y,m,day]=d.split('-');return`${day}.${m}.${y}`}
-async function loadData(){console.log('📥 Lade Daten...');try{const r=await fetch('/api/release_notes_manager/data?t='+Date.now());if(r.ok){const d=await r.json();console.log('✅ Geladen:',d);state.releases=d.releases||[];state.knownIssues=d.knownIssues||[];state.categories=d.categories||state.categories;state.settings=d.settings||state.settings}}catch(e){console.log('ℹ️ Erstmalige Nutzung')}render()}
-
-// Migriere alte Farbklassen zu neuen
-function migrateColorClasses() {
-  const colorMigrations = {
-    'bg-gray-100 text-gray-800': 'bg-gray-200 text-gray-800',
-    'bg-gray-900 text-white': 'bg-gray-800 text-white',
-    'bg-blue-100 text-blue-800': 'bg-blue-200 text-blue-900',
-    'bg-yellow-100 text-yellow-800': 'bg-yellow-100 text-yellow-900',
-    'bg-blue-600 text-white': 'bg-blue-600 text-white'  // Dunkelblau bleibt
-  };
-  
-  let migrated = false;
-  state.categories = state.categories.map(cat => {
-    if (colorMigrations[cat.color]) {
-      const newColor = colorMigrations[cat.color];
-      if (newColor !== cat.color) {
-        console.log(`🎨 Migriere ${cat.label}: ${cat.color} → ${newColor}`);
-        migrated = true;
-        return {...cat, color: newColor};
-      }
-    }
-    return cat;
-  });
-  
-  if (migrated) {
-    console.log('✅ Farben migriert, speichere...');
-    saveData();
-  }
+// Bis v0.6.4 wurden Tailwind-Klassen gespeichert (z. B. 'bg-red-100 text-red-800',
+// Backend-Standard 'bg-teal-500'). Bildet sie anhand des Farbtons auf eine Farb-ID ab.
+const LEGACY_HUES = {white: 'white', gray: 'gray', slate: 'gray', zinc: 'gray', neutral: 'gray', stone: 'gray', black: 'black', red: 'red', rose: 'pink', orange: 'orange', amber: 'yellow', yellow: 'yellow', green: 'green', emerald: 'green', lime: 'green', teal: 'green', sky: 'blue-light', cyan: 'blue-light', indigo: 'blue-dark', violet: 'purple', purple: 'purple', fuchsia: 'pink', pink: 'pink'};
+function toColorId(color) {
+  if (COLOR_IDS.has(color)) return color;
+  const m = /bg-([a-z]+)(?:-(\d+))?/.exec(color || '');
+  if (!m) return 'gray';
+  const hue = m[1], shade = parseInt(m[2] || '0', 10);
+  if (hue === 'blue') return shade >= 500 ? 'blue-dark' : 'blue-light';
+  if (hue === 'gray' && shade >= 700) return 'black';
+  return LEGACY_HUES[hue] || 'gray';
 }
+// Gibt true zurück, wenn mindestens eine Kategorie umgestellt wurde
+function normalizeCategoryColors() {
+  let changed = false;
+  state.categories = state.categories.map(c => {
+    const id = toColorId(c.color);
+    if (id === c.color) return c;
+    console.log(`🎨 Migriere ${c.label}: ${c.color} → ${id}`);
+    changed = true;
+    return {...c, color: id};
+  });
+  return changed;
+}
+function lblClass(color) { return 'lbl-' + toColorId(color); }
+
+// Theme: 'auto' übernimmt das aktive HA-Theme (die Seite läuft same-origin im iframe),
+// außerhalb von HA die Systemeinstellung. 'light'/'dark' überschreiben beides.
+const THEME_KEY = 'release_notes_theme';
+const HA_THEME_VARS = ['primary-background-color', 'card-background-color', 'ha-card-background', 'ha-card-border-radius', 'ha-card-box-shadow', 'primary-text-color', 'secondary-text-color', 'divider-color', 'primary-color', 'text-primary-color', 'success-color', 'warning-color', 'error-color', 'info-color', 'primary-font-family'];
+function getThemePref() { try { return localStorage.getItem(THEME_KEY) || 'auto'; } catch (e) { return 'auto'; } }
+function haParentRoot() {
+  try { if (window.parent !== window && window.parent.document) return window.parent.document.documentElement; } catch (e) {}
+  return null;
+}
+function isDarkColor(color) {
+  const el = document.createElement('span');
+  el.style.color = color;
+  document.body.appendChild(el);
+  const rgb = (getComputedStyle(el).color.match(/[\d.]+/g) || []).map(Number);
+  el.remove();
+  return rgb.length >= 3 && (0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]) < 128;
+}
+function haDarkMode(parentRoot, background) {
+  try {
+    const ha = parentRoot.ownerDocument.querySelector('home-assistant');
+    const dark = ha && ha.hass && ha.hass.themes && ha.hass.themes.darkMode;
+    if (typeof dark === 'boolean') return dark;
+  } catch (e) {}
+  return isDarkColor(background);
+}
+function applyTheme() {
+  const root = document.documentElement;
+  const pref = getThemePref();
+  HA_THEME_VARS.forEach(v => root.style.removeProperty('--' + v));
+  if (pref === 'light' || pref === 'dark') { root.dataset.theme = pref; return; }
+  const parentRoot = haParentRoot();
+  if (parentRoot) {
+    const cs = getComputedStyle(parentRoot);
+    const background = cs.getPropertyValue('--primary-background-color').trim();
+    if (background) {
+      HA_THEME_VARS.forEach(v => { const val = cs.getPropertyValue('--' + v).trim(); if (val) root.style.setProperty('--' + v, val); });
+      root.dataset.theme = haDarkMode(parentRoot, background) ? 'dark' : 'light';
+      return;
+    }
+  }
+  delete root.dataset.theme;
+}
+function watchTheme() {
+  const parentRoot = haParentRoot();
+  if (parentRoot) {
+    try { new MutationObserver(() => { if (getThemePref() === 'auto') applyTheme(); }).observe(parentRoot, {attributes: true, attributeFilter: ['style', 'class']}); } catch (e) {}
+  }
+  try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (getThemePref() === 'auto') applyTheme(); }); } catch (e) {}
+}
+function themeSwitchButtons() {
+  const pref = getThemePref();
+  return [['auto', 'Automatisch'], ['light', 'Hell'], ['dark', 'Dunkel']]
+    .map(([id, label]) => `<button type="button" aria-pressed="${pref === id}" onclick="setThemePref('${id}')">${label}</button>`).join('');
+}
+function setThemePref(pref) {
+  try { localStorage.setItem(THEME_KEY, pref); } catch (e) {}
+  applyTheme();
+  document.querySelectorAll('[data-theme-switch]').forEach(el => { el.innerHTML = themeSwitchButtons(); });
+}
+
+const state={releases:[],knownIssues:[],categories:[{id:'general',label:'Allgemein',color:'gray'},{id:'heating',label:'Heizung',color:'orange'},{id:'energy',label:'Energie',color:'green'},{id:'automation',label:'Automation',color:'blue-dark'},{id:'device',label:'Gerät',color:'purple'},{id:'integration',label:'Integration',color:'pink'}],settings:{autoUpdateDocs:true},expandedReleases:new Set(),expandedDetails:new Set(),displayCount:10,searchTerm:'',filterCategory:'all',editingRelease:null,editingCatId:null,editingCatLabel:'',resolvingIssueId:null,resolvingSolution:'',resolveVersion:'',colorPickerCatId:null};
+function formatDateDE(d){if(!d)return'';const[y,m,day]=d.split('-');return`${day}.${m}.${y}`}
+async function loadData(){console.log('📥 Lade Daten...');try{const r=await fetch('/api/release_notes_manager/data?t='+Date.now());if(r.ok){const d=await r.json();console.log('✅ Geladen:',d);state.releases=d.releases||[];state.knownIssues=d.knownIssues||[];state.categories=d.categories||state.categories;state.settings=d.settings||state.settings;if(normalizeCategoryColors())saveData()}}catch(e){console.log('ℹ️ Erstmalige Nutzung')}render()}
+
 async function saveData(){console.log('💾 Speichere...');setSaveStatus('Speichere...');const d={releases:state.releases,knownIssues:state.knownIssues,categories:state.categories,settings:state.settings,lastUpdate:new Date().toISOString()};try{const r=await fetch('/api/release_notes_manager/data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:JSON.stringify(d)})});if(r.ok){console.log('✅ Gespeichert');setSaveStatus('✅ Gespeichert!');setTimeout(()=>setSaveStatus(''),3000);return true}throw new Error(`API ${r.status}`)}catch(e){console.error('❌ Fehler:',e);setSaveStatus('❌ Fehler!');alert(`Speichern fehlgeschlagen!\n\n${e.message}`);return false}}
 function exportData(){const d={releases:state.releases,knownIssues:state.knownIssues,categories:state.categories,settings:state.settings,lastUpdate:new Date().toISOString()};const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');const stamp=new Date().toISOString().slice(0,10);a.href=url;a.download=`release-notes-export-${stamp}.json`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url)}
-function handleImportFile(event){const file=event.target.files&&event.target.files[0];event.target.value='';if(!file)return;const reader=new FileReader();reader.onload=async()=>{let d;try{d=JSON.parse(reader.result)}catch(e){alert(`Import fehlgeschlagen: Datei enthält kein gültiges JSON.\n\n${e.message}`);return}if(!d||!Array.isArray(d.releases)){alert('Import fehlgeschlagen: Datei enthält keine gültigen Release-Notes-Daten (Feld "releases" fehlt).');return}if(!confirm(`Import wird die aktuellen Daten vollständig ersetzen (${d.releases.length} Releases in der Datei).\n\nFortfahren?`))return;state.releases=d.releases;state.knownIssues=Array.isArray(d.knownIssues)?d.knownIssues:[];state.categories=Array.isArray(d.categories)&&d.categories.length>0?d.categories:state.categories;state.settings=d.settings&&typeof d.settings==='object'?d.settings:state.settings;if(await saveData()){render()}};reader.onerror=()=>alert('Import fehlgeschlagen: Datei konnte nicht gelesen werden.');reader.readAsText(file)}
+function handleImportFile(event){const file=event.target.files&&event.target.files[0];event.target.value='';if(!file)return;const reader=new FileReader();reader.onload=async()=>{let d;try{d=JSON.parse(reader.result)}catch(e){alert(`Import fehlgeschlagen: Datei enthält kein gültiges JSON.\n\n${e.message}`);return}if(!d||!Array.isArray(d.releases)){alert('Import fehlgeschlagen: Datei enthält keine gültigen Release-Notes-Daten (Feld "releases" fehlt).');return}if(!confirm(`Import wird die aktuellen Daten vollständig ersetzen (${d.releases.length} Releases in der Datei).\n\nFortfahren?`))return;state.releases=d.releases;state.knownIssues=Array.isArray(d.knownIssues)?d.knownIssues:[];state.categories=Array.isArray(d.categories)&&d.categories.length>0?d.categories:state.categories;state.settings=d.settings&&typeof d.settings==='object'?d.settings:state.settings;normalizeCategoryColors();if(await saveData()){render()}};reader.onerror=()=>alert('Import fehlgeschlagen: Datei konnte nicht gelesen werden.');reader.readAsText(file)}
 function setSaveStatus(t){document.getElementById('save-status').textContent=t}
 function createNewRelease(){const today=new Date().toISOString().split('T')[0];const open=state.knownIssues.filter(i=>i.status!=='resolved');const inherited=open.map(i=>({...JSON.parse(JSON.stringify(i)),inheritedFrom:true}));console.log(`📋 Übernehme ${inherited.length} offene Fehler`);state.editingRelease={id:Date.now(),version:'',name:'',date:today,features:[],changes:[],knownIssues:inherited,comments:''};showModal('release')}
 function rebuildKnownIssues(){const byId=new Map();const sorted=[...state.releases].sort((a,b)=>new Date(b.date)-new Date(a.date)||b.id-a.id);sorted.forEach(r=>{(r.knownIssues||[]).forEach(i=>{if(!byId.has(i.id))byId.set(i.id,i)})});state.knownIssues=Array.from(byId.values())}
@@ -353,74 +473,35 @@ function reopenIssue(id){state.editingRelease.knownIssues=state.editingRelease.k
 function cancelResolveIssue(){state.resolvingIssueId=null;state.resolvingSolution='';state.resolveVersion='';renderModal()}
 function showCategoriesManager(){showModal('categories')}
 function showSettings(){showModal('settings')}
-async function addCategory(){const l=document.getElementById('new-cat-input').value.trim();if(!l)return;const colors=['bg-gray-100 text-gray-800','bg-orange-100 text-orange-800'];state.categories.push({id:`custom_${Date.now()}`,label:l,color:colors[state.categories.length%colors.length]});await saveData();document.getElementById('new-cat-input').value='';renderModal()}
+async function addCategory(){const l=document.getElementById('new-cat-input').value.trim();if(!l)return;const colors=['gray','orange'];state.categories.push({id:`custom_${Date.now()}`,label:l,color:colors[state.categories.length%colors.length]});await saveData();document.getElementById('new-cat-input').value='';renderModal()}
 function startEditCat(id,l){state.editingCatId=id;state.editingCatLabel=l;renderModal()}
 async function saveEditCat(){if(!state.editingCatLabel.trim())return;state.categories=state.categories.map(c=>c.id===state.editingCatId?{...c,label:state.editingCatLabel.trim()}:c);await saveData();state.editingCatId=null;state.editingCatLabel='';renderModal()}
 function cancelEditCat(){state.editingCatId=null;state.editingCatLabel='';renderModal()}
 async function deleteCategory(id){if(!confirm('Kategorie löschen?'))return;state.categories=state.categories.filter(c=>c.id!==id);await saveData();renderModal()}
 
-function showColorPicker(catId, event) {
-  event.stopPropagation();
-  
-  // Entferne altes Popup
-  const old = document.querySelector('.color-picker-popup');
-  if (old) old.remove();
-  
-  // Erstelle Popup
-  const popup = document.createElement('div');
-  popup.className = 'color-picker-popup';
-  popup.style.cssText = 'position: fixed; z-index: 1000; background: white; border: 1px solid #ccc; border-radius: 8px; padding: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; gap: 4px;';
-  
-  // Position relativ zum Klick
-  const rect = event.target.getBoundingClientRect();
-  popup.style.left = (rect.right + 10) + 'px';
-  popup.style.top = rect.top + 'px';
-  
-  // Füge Farben hinzu
-  CATEGORY_COLORS.forEach(col => {
-    const box = document.createElement('div');
-    box.className = col.class;
-    box.style.cssText = 'width: 24px; height: 24px; border-radius: 4px; cursor: pointer;';
-    box.title = col.label;
-    box.onmouseover = () => box.style.outline = '2px solid #3b82f6';
-    box.onmouseout = () => box.style.outline = 'none';
-    box.onclick = (e) => {
-      e.stopPropagation();
-      selectColor(catId, col.class);
-    };
-    popup.appendChild(box);
-  });
-  
-  document.body.appendChild(popup);
-  
-  // Schließe bei Klick außerhalb
-  setTimeout(() => {
-    const closeHandler = () => {
-      popup.remove();
-      document.removeEventListener('click', closeHandler);
-    };
-    document.addEventListener('click', closeHandler);
-  }, 10);
-}
-
-function selectColor(catId, colorClass) {
-  state.categories = state.categories.map(c => 
-    c.id === catId ? {...c, color: colorClass} : c
+// Farbauswahl klappt direkt unter der Kategorie im Dialog auf
+function toggleColorPicker(catId){state.colorPickerCatId=state.colorPickerCatId===catId?null:catId;renderModal()}
+function renderColorPicker(cat){const current=toColorId(cat.color);return`<div class="color-picker" role="group" aria-label="Farbe für ${esc(cat.label)}">${CATEGORY_COLORS.map(col=>`<button type="button" aria-pressed="${col.id===current}" title="${col.label}" onclick="selectColor('${cat.id}','${col.id}')"><span class="lbl lbl-${col.id}">${col.label}</span></button>`).join('')}</div>`}
+function selectColor(catId, colorId) {
+  state.categories = state.categories.map(c =>
+    c.id === catId ? {...c, color: colorId} : c
   );
-  const popup = document.querySelector('.color-picker-popup');
-  if (popup) popup.remove();
+  state.colorPickerCatId = null;
   saveData();
   renderModal();
+  render();
 }
 function showModal(t){document.getElementById('modal').classList.add('active');document.getElementById('modal').dataset.type=t;renderModal()}
-function hideModal(){document.getElementById('modal').classList.remove('active');state.editingRelease=null;state.resolvingIssueId=null}
+function hideModal(){document.getElementById('modal').classList.remove('active');state.editingRelease=null;state.resolvingIssueId=null;state.colorPickerCatId=null}
 function render(){renderCategoryFilter();renderReleases()}
 function renderCategoryFilter(){const s=document.getElementById('category-filter');s.innerHTML='<option value="all">Alle Kategorien</option>'+[...state.categories].sort((a,b)=>a.label.localeCompare(b.label,'de')).map(c=>`<option value="${c.id}" ${state.filterCategory===c.id?'selected':''}>${c.label}</option>`).join('')}
-function renderReleases(){const allFiltered=state.releases.filter(r=>{const ms=!state.searchTerm||JSON.stringify(r).toLowerCase().includes(state.searchTerm.toLowerCase());const mc=state.filterCategory==='all'||r.features.some(f=>f.category===state.filterCategory)||r.changes.some(c=>c.category===state.filterCategory);return ms&&mc});const f=state.searchTerm?allFiltered:allFiltered.slice(0,state.displayCount);const c=document.getElementById('releases-container');const hasMore=!state.searchTerm&&allFiltered.length>state.displayCount;c.innerHTML=f.length===0?'<div class="text-center py-12 text-gray-500"><p class="text-xl font-semibold mb-2">Keine Releases</p><p>Erstelle dein erstes Release!</p></div>':f.map(r=>renderRelease(r)).join('')+(hasMore?'<div class="text-center py-6 bg-gray-50"><button onclick="loadMore()" class="text-blue-600 hover:text-blue-800 hover:underline font-medium text-base bg-white rounded shadow-sm" style="padding: 0.5em 0.75em;">Weitere Releases laden ('+((allFiltered.length-state.displayCount))+' verbleibend)</button></div>':'')}
+function renderReleases(){const allFiltered=state.releases.filter(r=>{const ms=!state.searchTerm||JSON.stringify(r).toLowerCase().includes(state.searchTerm.toLowerCase());const mc=state.filterCategory==='all'||r.features.some(f=>f.category===state.filterCategory)||r.changes.some(c=>c.category===state.filterCategory);return ms&&mc});const f=state.searchTerm?allFiltered:allFiltered.slice(0,state.displayCount);const c=document.getElementById('releases-container');const hasMore=!state.searchTerm&&allFiltered.length>state.displayCount;const newestId=newestReleaseId();c.innerHTML=f.length===0?'<div class="card empty"><p class="empty-title">Keine Releases</p><p>Erstelle dein erstes Release!</p></div>':f.map(r=>renderRelease(r,r.id===newestId)).join('')+(hasMore?'<div class="more"><button class="btn" onclick="loadMore()">Weitere Releases laden ('+((allFiltered.length-state.displayCount))+' verbleibend)</button></div>':'')}
+// Neuestes Release nach Datum (gleiche Sortierung wie rebuildKnownIssues) - bekommt den Chip "Aktuell"
+function newestReleaseId(){const sorted=[...state.releases].sort((a,b)=>new Date(b.date)-new Date(a.date)||b.id-a.id);return sorted.length?sorted[0].id:null}
 
-function renderRelease(r){ const exp=state.expandedReleases.has(r.id); const getCat=id=>state.categories.find(c=>c.id===id)||{label:id,color:'bg-gray-100 text-gray-800'}; const open=(r.knownIssues||[]).filter(i=>i.status!=='resolved'); const resolved=(r.knownIssues||[]).filter(i=>i.status==='resolved'&&i.resolvedInVersion===r.version); const title=r.name?`Version ${esc(r.version)} - ${esc(r.name)}`:`Version ${esc(r.version)}`; const isDetailExpanded=(type,id)=>state.expandedDetails.has(r.id+'-'+type+'-'+id); return`<div class="bg-white shadow rounded-lg mb-4"><div class="p-4 release-header-wrapper"><div class="release-top-row cursor-pointer" onclick="toggleRelease(${r.id})"><div><h2 class="text-xl font-bold text-blue-600 release-title">${title}</h2><p class="text-sm text-gray-600 release-date">${formatDateDE(r.date)}</p></div><div class="flex gap-2" onclick="event.stopPropagation()"><button class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300" onclick="editRelease(${r.id})" title="Release bearbeiten">✏️</button></div></div><div class="release-bottom-row"><div class="release-badges">${getSummaryBadges(r)}</div></div></div>${exp?`<div class="border-t p-4">${r.features&&r.features.length>0?`<div class="mb-4"><h3 class="text-xl font-semibold mb-3">✨ Neue Features</h3>${r.features.map(f=>{const cat=getCat(f.category);const detKey='f-'+f.id;return`<div class="flex gap-2 mb-3 pl-3"><span class="px-2 py-1 rounded text-sm w-40 text-center ${cat.color}">${cat.label}</span><div class="flex-1"><div class="font-medium">${esc(f.title)}</div>${f.details?`<div><a href="javascript:void(0)" onclick="toggleDetails(${r.id},'f',${f.id})" class="text-xs text-blue-600 hover:underline">${isDetailExpanded('f',f.id)?'▼ Ausblenden':'▶ Details anzeigen'}</a>${isDetailExpanded('f',f.id)?`<p class="text-sm text-gray-600 mt-1">${esc(f.details)}</p>`:''}</div>`:''}</div></div>`}).join('')}</div>`:''}${r.changes&&r.changes.length>0||resolved.length>0?`<div class="mb-4"><h3 class="text-xl font-semibold mb-3">🔄 Änderungen / Bugfixes</h3>${r.changes.map(c=>{const cat=getCat(c.category);return`<div class="flex gap-2 mb-3 pl-3"><span class="px-2 py-1 rounded text-sm w-40 text-center ${cat.color}">${cat.label}</span><div class="flex-1"><div class="font-medium">${esc(c.title)}</div>${c.details?`<div><a href="javascript:void(0)" onclick="toggleDetails(${r.id},'c',${c.id})" class="text-xs text-blue-600 hover:underline">${isDetailExpanded('c',c.id)?'▼ Ausblenden':'▶ Details anzeigen'}</a>${isDetailExpanded('c',c.id)?`<p class="text-sm text-gray-600 mt-1">${esc(c.details)}</p>`:''}</div>`:''}</div></div>`}).join('')}${resolved.map(i=>{const cat=getCat(i.category);return`<div class="flex gap-2 mb-3 pl-3"><span class="px-2 py-1 rounded text-sm w-40 text-center ${cat.color}">${cat.label}</span><div class="flex-1"><div class="font-medium">🐛 Gelöst in ${esc(r.version)}: ${esc(i.title)}</div>${i.resolution?`<p class="text-sm text-gray-600">${esc(i.resolution)}</p>`:''}</div></div>`}).join('')}</div>`:''}${open.length>0?`<div class="mb-4"><h3 class="text-xl font-semibold mb-3">⚠️ Bekannte Fehler</h3>${open.map(i=>{const cat=getCat(i.category);return`<div class="border border-yellow-200 rounded mb-2 bg-yellow-50"><div class="flex gap-2 items-stretch p-3"><span class="px-2 py-1 rounded text-sm w-40 text-center ${cat.color}">${cat.label}</span><div class="flex-1"><div class="font-medium">${esc(i.title)}</div>${i.details?`<div><a href="javascript:void(0)" onclick="toggleDetails(${r.id},'i',${i.id})" class="text-xs text-blue-600 hover:underline">${isDetailExpanded('i',i.id)?'▼ Ausblenden':'▶ Details anzeigen'}</a>${isDetailExpanded('i',i.id)?`<p class="text-sm text-gray-600 mt-1">${esc(i.details)}</p>`:''}</div>`:''}</div></div></div>`}).join('')}</div>`:''}${r.comments?`<div class="text-sm text-gray-600 bg-gray-50 p-3 rounded">${esc(r.comments)}</div>`:''}</div>`:''}</div>` }
+function renderRelease(r,isNewest){ const exp=state.expandedReleases.has(r.id); const getCat=id=>state.categories.find(c=>c.id===id)||{label:id,color:'gray'}; const lbl=id=>{const cat=getCat(id||'general');return`<span class="lbl ${lblClass(cat.color)}">${esc(cat.label)}</span>`}; const open=(r.knownIssues||[]).filter(i=>i.status!=='resolved'); const resolved=(r.knownIssues||[]).filter(i=>i.status==='resolved'&&i.resolvedInVersion===r.version); const title=r.name?`Version ${esc(r.version)} - ${esc(r.name)}`:`Version ${esc(r.version)}`; const item=(type,i)=>{const isOpen=state.expandedDetails.has(r.id+'-'+type+'-'+i.id);const head=i.details?`<button type="button" class="item-toggle${isOpen?' open':''}" aria-expanded="${isOpen}" onclick="toggleDetails(${r.id},'${type}',${i.id})">${esc(i.title)}</button>`:`<div class="item-title">${esc(i.title)}</div>`;return`${lbl(i.category)}<div class="item-main">${head}${isOpen&&i.details?`<div class="item-details">${esc(i.details)}</div>`:''}</div>`}; const group=(heading,rows,cls='')=>`<div><h3 class="group-title">${heading}</h3><ul class="items${cls}">${rows}</ul></div>`; const body=(r.features&&r.features.length>0?group('Neue Features',r.features.map(f=>`<li class="item">${item('f',f)}</li>`).join('')):'')+(r.changes&&r.changes.length>0||resolved.length>0?group('Änderungen / Bugfixes',r.changes.map(c=>`<li class="item">${item('c',c)}</li>`).join('')+resolved.map(i=>`<li class="item">${lbl(i.category)}<div class="item-main"><div class="item-title">${esc(i.title)}</div><div class="chips"><span class="chip chip-done">Gelöst in ${esc(r.version)}</span></div>${i.resolution?`<div class="item-resolution">${esc(i.resolution)}</div>`:''}</div></li>`).join('')):'')+(open.length>0?group('Bekannte Fehler',open.map(i=>`<li class="item issue">${item('i',i)}</li>`).join(''),' issues'):'')+(r.comments?`<div class="note">${esc(r.comments)}</div>`:''); return`<div class="card release${exp?' open':''}"><div class="release-head" role="button" tabindex="0" aria-expanded="${exp}" onclick="toggleRelease(${r.id})" onkeydown="if(event.target===this&&(event.key==='Enter'||event.key===' ')){event.preventDefault();toggleRelease(${r.id})}"><div class="release-title-row"><h2 class="release-title">${title}</h2><div class="release-meta"><span class="release-date">${formatDateDE(r.date)}</span><button type="button" class="btn-icon" onclick="event.stopPropagation();editRelease(${r.id})" title="Release bearbeiten" aria-label="Release bearbeiten"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/></svg></button></div></div><div class="chips">${isNewest?'<span class="chip chip-now">Aktuell</span>':''}${getSummaryBadges(r)}</div></div>${exp?`<div class="release-body">${body}</div>`:''}</div>` }
 
-function renderModal(){const m=document.getElementById('modal');const c=m.querySelector('.modal-content');const t=m.dataset.type;if(t==='categories'){c.innerHTML=`<div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold">Kategorien verwalten</h2><button class="px-4 py-2 bg-gray-200 rounded" onclick="hideModal()">Schließen</button></div><div class="mb-6"><label class="block text-sm font-medium mb-2">Neue Kategorie</label><div class="flex gap-2"><input type="text" id="new-cat-input" placeholder="Name..." class="flex-1 px-3 py-2 rounded" onkeypress="if(event.key==='Enter')addCategory()"/><button class="px-4 py-2 bg-blue-600 text-white rounded" onclick="addCategory()">+ Hinzufügen</button></div></div>${[...state.categories].sort((a,b)=>a.label.localeCompare(b.label,'de')).map(c=>state.editingCatId===c.id?`<div class="flex gap-2 items-center p-3 border rounded mb-2"><input type="text" value="${escInput(state.editingCatLabel)}" oninput="state.editingCatLabel=this.value" class="flex-1 px-2 py-1 rounded" onkeypress="if(event.key==='Enter')saveEditCat()"/><button class="px-3 py-1 bg-green-600 text-white rounded" onclick="saveEditCat()">Speichern</button><button class="px-3 py-1 bg-gray-200 rounded" onclick="cancelEditCat()">Abbrechen</button></div>`:`<div class="flex justify-between items-center p-3 border rounded mb-2"><span class="px-3 py-1 rounded text-sm ${c.color} cursor-pointer hover:opacity-80" onclick="showColorPicker('${c.id}', event)" title="Klicken um Farbe zu ändern">${c.label}</span><div class="flex gap-2"><button class="px-3 py-1 bg-gray-200 rounded" onclick="startEditCat('${c.id}','${esc(c.label)}')">Name ändern</button><button class="px-3 py-1 bg-red-100 text-red-600 rounded" onclick="deleteCategory('${c.id}')">Löschen</button></div></div>`).join('')}`}else if(t==='release'&&state.editingRelease){const r=state.editingRelease;const isNew=!state.releases.find(rel=>rel.id===r.id);const inherited=r.knownIssues.filter(i=>i.inheritedFrom).length;c.innerHTML=`<div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold">${isNew?'Neues Release':'Release bearbeiten'}</h2><div class="flex gap-2"><button class="px-4 py-2 bg-gray-200 rounded" onclick="hideModal()">Abbrechen</button><button class="px-4 py-2 bg-blue-600 text-white rounded" onclick="saveRelease()">Speichern</button></div></div>${isNew&&inherited>0?`<div class="bg-yellow-50 border border-yellow-200 rounded p-3 mb-4"><p class="text-sm"><strong>ℹ️ ${inherited} offene${inherited===1?'r Fehler wurde':' Fehler wurden'} automatisch übernommen</strong></p></div>`:''}<div class="grid grid-cols-2 gap-4 mb-4"><div><label class="block text-sm font-medium mb-2">Version *</label><input type="text" value="${escInput(r.version)}" oninput="state.editingRelease.version=this.value" class="w-full px-3 py-2 rounded" placeholder="z.B. 2025.1.1"/></div><div><label class="block text-sm font-medium mb-2">Name (optional)</label><input type="text" value="${escInput(r.name||'')}" oninput="state.editingRelease.name=this.value" class="w-full px-3 py-2 rounded" placeholder="z.B. Stable Release"/></div></div><div class="mb-4"><label class="block text-sm font-medium mb-2">Datum</label><input type="date" value="${r.date}" oninput="state.editingRelease.date=this.value" class="w-full px-3 py-2 rounded"/></div><div class="border-t pt-4 mb-4 drop-zone" ondragover="handleDragOver(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event,'features')"><div class="flex justify-between mb-3"><h3 class="text-xl font-semibold">✨ Neue Features</h3><button class="px-3 py-1 bg-green-600 text-white rounded" onclick="addItem('features')">+ Hinzufügen</button></div>${r.features.map(f=>`<div class="border rounded p-3 mb-3 bg-gray-50 item-card" ondragover="handleCardDragOver(event)" ondragleave="handleCardDragLeave(event)" ondrop="handleCardDrop(event,'features',${f.id})"><div class="flex gap-2 mb-2"><span class="drag-handle" draggable="true" ondragstart="handleDragStart(event,'features',${f.id})" ondragend="handleDragEnd(event)" title="Verschieben">⠿</span><input type="text" value="${escInput(f.title)}" oninput="updateItem('features',${f.id},'title',this.value)" placeholder="Titel..." class="flex-1 px-2 py-1 rounded"/><select onchange="updateItem('features',${f.id},'category',this.value)" class="px-2 py-1 rounded">${[...state.categories].sort((a,b)=>a.label.localeCompare(b.label,'de')).map(c=>`<option value="${c.id}" ${f.category===c.id?'selected':''}>${c.label}</option>`).join('')}</select><button class="px-2 py-1 bg-red-100 text-red-600 rounded" onclick="removeItem('features',${f.id})">×</button></div><textarea oninput="updateItem('features',${f.id},'details',this.value)" placeholder="Details..." class="w-full px-2 py-1 rounded" rows="3">${escInput(f.details||'')}</textarea></div>`).join('')}${r.features.length===0?'<p class="text-gray-500 italic">Keine Features</p>':''}</div><div class="border-t pt-4 mb-4 drop-zone" ondragover="handleDragOver(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event,'changes')"><div class="flex justify-between mb-3"><h3 class="text-xl font-semibold">🔄 Änderungen / Bugfixes</h3><button class="px-3 py-1 bg-green-600 text-white rounded" onclick="addItem('changes')">+ Hinzufügen</button></div>${r.changes.map(c=>`<div class="border rounded p-3 mb-3 bg-gray-50 item-card" ondragover="handleCardDragOver(event)" ondragleave="handleCardDragLeave(event)" ondrop="handleCardDrop(event,'changes',${c.id})"><div class="flex gap-2 mb-2"><span class="drag-handle" draggable="true" ondragstart="handleDragStart(event,'changes',${c.id})" ondragend="handleDragEnd(event)" title="Verschieben">⠿</span><input type="text" value="${escInput(c.title)}" oninput="updateItem('changes',${c.id},'title',this.value)" placeholder="Titel..." class="flex-1 px-2 py-1 rounded"/><select onchange="updateItem('changes',${c.id},'category',this.value)" class="px-2 py-1 rounded">${[...state.categories].sort((a,b)=>a.label.localeCompare(b.label,'de')).map(cat=>`<option value="${cat.id}" ${c.category===cat.id?'selected':''}>${cat.label}</option>`).join('')}</select><button class="px-2 py-1 bg-red-100 text-red-600 rounded" onclick="removeItem('changes',${c.id})">×</button></div><textarea oninput="updateItem('changes',${c.id},'details',this.value)" placeholder="Details..." class="w-full px-2 py-1 rounded" rows="3">${escInput(c.details||'')}</textarea></div>`).join('')}${r.changes.length===0?'<p class="text-gray-500 italic">Keine Änderungen</p>':''}</div><div class="border-t pt-4 mb-4"><div class="flex justify-between mb-3"><h3 class="text-xl font-semibold">⚠️ Bekannte Fehler</h3><button class="px-3 py-1 bg-yellow-600 text-white rounded" onclick="addKnownIssue()">+ Hinzufügen</button></div>${r.knownIssues.map(i=>state.resolvingIssueId===i.id?`<div class="space-y-3"><div class="bg-green-50 border border-green-200 rounded p-3"><h4 class="font-semibold text-green-800 mb-2">✓ Fehler als gelöst markieren</h4><p class="text-sm text-green-700 mb-3">Fehler: <strong>${esc(i.title)}</strong></p><div class="space-y-2"><label class="block text-sm font-medium text-gray-700">In Version gelöst (optional):</label><input type="text" value="${escInput(state.resolveVersion)}" oninput="state.resolveVersion=this.value" placeholder="${r.version}" class="w-full px-3 py-2 border rounded"/><label class="block text-sm font-medium text-gray-700 mt-3">Beschreibung der Lösung (optional):</label><textarea oninput="state.resolvingSolution=this.value" placeholder="Beschreibe wie der Fehler gelöst wurde..." class="w-full px-3 py-2 border rounded" rows="3">${escInput(state.resolvingSolution)}</textarea></div><div class="flex gap-2 mt-3"><button class="px-4 py-2 bg-green-600 text-white rounded" onclick="confirmResolveIssue()">${state.resolvingSolution.trim()?'Lösung dokumentieren':'Als gelöst markieren'}</button><button class="px-4 py-2 bg-gray-200 rounded" onclick="cancelResolveIssue()">Abbrechen</button></div></div></div>`:i.status==='resolved'?`<div class="border border-green-200 rounded p-3 mb-3 bg-green-50"><div class="flex gap-2 mb-2 items-start"><span class="px-2 py-1 rounded text-sm bg-green-100 text-green-800">✓ Gelöst in ${esc(i.resolvedInVersion||'?')}</span><div class="flex-1"><div class="font-medium text-gray-600 line-through">${esc(i.title)}</div>${i.resolution?`<p class="text-sm text-gray-600">${esc(i.resolution)}</p>`:''}</div><button class="px-2 py-1 bg-yellow-100 text-yellow-600 rounded" onclick="reopenIssue(${i.id})" title="Fehler wieder öffnen">🔓 Wieder öffnen</button></div></div>`:`<div class="border border-yellow-200 rounded p-3 mb-3 bg-yellow-50"><div class="flex gap-2 mb-2"><input type="text" value="${escInput(i.title)}" oninput="updateKnownIssue(${i.id},'title',this.value)" placeholder="Fehler..." class="flex-1 px-2 py-1 rounded"/><select onchange="updateKnownIssue(${i.id},'category',this.value)" class="px-2 py-1 rounded">${[...state.categories].sort((a,b)=>a.label.localeCompare(b.label,'de')).map(cat=>`<option value="${cat.id}" ${(i.category||'general')===cat.id?'selected':''}>${cat.label}</option>`).join('')}</select><button class="px-2 py-1 bg-green-100 text-green-600 rounded" onclick="startResolveIssue(${i.id})" title="Als gelöst markieren">✓ Gelöst</button><button class="px-2 py-1 bg-red-100 text-red-600 rounded" onclick="removeKnownIssue(${i.id})">×</button></div><textarea oninput="updateKnownIssue(${i.id},'details',this.value)" placeholder="Details..." class="w-full px-2 py-1 rounded" rows="2">${escInput(i.details||'')}</textarea></div>`).join('')}${r.knownIssues.length===0?'<p class="text-gray-500 italic">Keine bekannten Fehler</p>':''}</div><div class="border-t pt-4"><label class="block text-sm font-medium mb-2">Kommentare (optional)</label><textarea oninput="state.editingRelease.comments=this.value" class="w-full px-3 py-2 rounded" rows="3" placeholder="Zusätzliche Informationen...">${escInput(r.comments||'')}</textarea></div><div class="border-t pt-4 mt-4 flex justify-end"><button class="px-4 py-2 bg-red-600 text-white rounded font-medium hover:bg-red-700" onclick="deleteCurrentRelease()">Release vollständig löschen</button></div>`}else if(t==='settings'){c.innerHTML=`<div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold">🔧 Einstellungen</h2><button class="px-4 py-2 bg-gray-200 rounded" onclick="hideModal()">Schließen</button></div><div class="border rounded p-4 mb-4"><h3 class="text-lg font-semibold mb-2">🔄 Automatische Update-Dokumentation</h3><p class="text-sm text-gray-600 mb-3">Erstellt automatisch Release-Notes-Einträge, wenn Home-Assistant-Update-Entitäten ein Update abschließen oder neu hinzukommen/verschwinden.</p><label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" ${state.settings.autoUpdateDocs?'checked':''} onchange="toggleAutoUpdateDocs(this.checked)"/><span class="text-sm">Automatische Update-Dokumentation aktiviert</span></label></div><div class="border rounded p-4 mb-4"><h3 class="text-lg font-semibold mb-2">💾 Daten</h3><p class="text-sm text-gray-600 mb-3">Datenstand sichern oder aus einer Sicherung wiederherstellen.</p><div class="flex gap-2"><button class="px-4 py-2 bg-gray-200 rounded" onclick="exportData()">⬇️ Exportieren</button><button class="px-4 py-2 bg-gray-200 rounded" onclick="document.getElementById('import-file-input').click()">⬆️ Importieren</button></div></div>`}}
+function renderModal(){const m=document.getElementById('modal');const c=m.querySelector('.modal-content');const t=m.dataset.type;if(t==='categories'){c.innerHTML=`<div class="flex justify-between items-center mb-6"><h2 class="dialog-title">Kategorien verwalten</h2><button class="btn" onclick="hideModal()">Schließen</button></div><div class="mb-6"><label class="block text-sm font-medium mb-2">Neue Kategorie</label><div class="flex gap-2"><input type="text" id="new-cat-input" placeholder="Name..." class="flex-1 px-3 py-2 rounded" onkeypress="if(event.key==='Enter')addCategory()"/><button class="btn btn-primary" onclick="addCategory()">+ Hinzufügen</button></div></div>${[...state.categories].sort((a,b)=>a.label.localeCompare(b.label,'de')).map(c=>state.editingCatId===c.id?`<div class="cat-row"><input type="text" value="${escInput(state.editingCatLabel)}" oninput="state.editingCatLabel=this.value" class="flex-1 px-2 py-1 rounded" onkeypress="if(event.key==='Enter')saveEditCat()"/><button class="btn btn-sm btn-primary" onclick="saveEditCat()">Speichern</button><button class="btn btn-sm" onclick="cancelEditCat()">Abbrechen</button></div>`:`<div class="cat-row"><span class="lbl ${lblClass(c.color)} lbl-pick" role="button" tabindex="0" aria-expanded="${state.colorPickerCatId===c.id}" onclick="toggleColorPicker('${c.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleColorPicker('${c.id}')}" title="Klicken um Farbe zu ändern">${esc(c.label)}</span><div class="flex gap-2"><button class="btn btn-sm" onclick="startEditCat('${c.id}','${esc(c.label)}')">Name ändern</button><button class="btn btn-sm btn-danger" onclick="deleteCategory('${c.id}')">Löschen</button></div></div>${state.colorPickerCatId===c.id?renderColorPicker(c):''}`).join('')}`}else if(t==='release'&&state.editingRelease){const r=state.editingRelease;const isNew=!state.releases.find(rel=>rel.id===r.id);const inherited=r.knownIssues.filter(i=>i.inheritedFrom).length;c.innerHTML=`<div class="flex justify-between items-center mb-6"><h2 class="dialog-title">${isNew?'Neues Release':'Release bearbeiten'}</h2><div class="flex gap-2"><button class="btn" onclick="hideModal()">Abbrechen</button><button class="btn btn-primary" onclick="saveRelease()">Speichern</button></div></div>${isNew&&inherited>0?`<div class="notice mb-4"><p class="text-sm"><strong>${inherited} offene${inherited===1?'r Fehler wurde':' Fehler wurden'} automatisch übernommen</strong></p></div>`:''}<div class="grid grid-cols-2 gap-4 mb-4"><div><label class="block text-sm font-medium mb-2">Version *</label><input type="text" value="${escInput(r.version)}" oninput="state.editingRelease.version=this.value" class="w-full px-3 py-2 rounded" placeholder="z.B. 2025.1.1"/></div><div><label class="block text-sm font-medium mb-2">Name (optional)</label><input type="text" value="${escInput(r.name||'')}" oninput="state.editingRelease.name=this.value" class="w-full px-3 py-2 rounded" placeholder="z.B. Stable Release"/></div></div><div class="mb-4"><label class="block text-sm font-medium mb-2">Datum</label><input type="date" value="${r.date}" oninput="state.editingRelease.date=this.value" class="w-full px-3 py-2 rounded"/></div><div class="border-t pt-4 mb-4 drop-zone" ondragover="handleDragOver(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event,'features')"><div class="flex justify-between mb-3"><h3 class="section-title">Neue Features</h3><button class="btn btn-sm" onclick="addItem('features')">+ Hinzufügen</button></div>${r.features.map(f=>`<div class="edit-row item-card" ondragover="handleCardDragOver(event)" ondragleave="handleCardDragLeave(event)" ondrop="handleCardDrop(event,'features',${f.id})"><div class="flex gap-2 mb-2"><span class="drag-handle" draggable="true" ondragstart="handleDragStart(event,'features',${f.id})" ondragend="handleDragEnd(event)" title="Verschieben">⠿</span><input type="text" value="${escInput(f.title)}" oninput="updateItem('features',${f.id},'title',this.value)" placeholder="Titel..." class="flex-1 px-2 py-1 rounded"/><select onchange="updateItem('features',${f.id},'category',this.value)" class="px-2 py-1 rounded">${[...state.categories].sort((a,b)=>a.label.localeCompare(b.label,'de')).map(c=>`<option value="${c.id}" ${f.category===c.id?'selected':''}>${c.label}</option>`).join('')}</select><button class="btn-icon btn-icon-danger" title="Entfernen" aria-label="Entfernen" onclick="removeItem('features',${f.id})">×</button></div><textarea oninput="updateItem('features',${f.id},'details',this.value)" placeholder="Details..." class="w-full px-2 py-1 rounded" rows="3">${escInput(f.details||'')}</textarea></div>`).join('')}${r.features.length===0?'<p class="text-gray-500 italic">Keine Features</p>':''}</div><div class="border-t pt-4 mb-4 drop-zone" ondragover="handleDragOver(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event,'changes')"><div class="flex justify-between mb-3"><h3 class="section-title">Änderungen / Bugfixes</h3><button class="btn btn-sm" onclick="addItem('changes')">+ Hinzufügen</button></div>${r.changes.map(c=>`<div class="edit-row item-card" ondragover="handleCardDragOver(event)" ondragleave="handleCardDragLeave(event)" ondrop="handleCardDrop(event,'changes',${c.id})"><div class="flex gap-2 mb-2"><span class="drag-handle" draggable="true" ondragstart="handleDragStart(event,'changes',${c.id})" ondragend="handleDragEnd(event)" title="Verschieben">⠿</span><input type="text" value="${escInput(c.title)}" oninput="updateItem('changes',${c.id},'title',this.value)" placeholder="Titel..." class="flex-1 px-2 py-1 rounded"/><select onchange="updateItem('changes',${c.id},'category',this.value)" class="px-2 py-1 rounded">${[...state.categories].sort((a,b)=>a.label.localeCompare(b.label,'de')).map(cat=>`<option value="${cat.id}" ${c.category===cat.id?'selected':''}>${cat.label}</option>`).join('')}</select><button class="btn-icon btn-icon-danger" title="Entfernen" aria-label="Entfernen" onclick="removeItem('changes',${c.id})">×</button></div><textarea oninput="updateItem('changes',${c.id},'details',this.value)" placeholder="Details..." class="w-full px-2 py-1 rounded" rows="3">${escInput(c.details||'')}</textarea></div>`).join('')}${r.changes.length===0?'<p class="text-gray-500 italic">Keine Änderungen</p>':''}</div><div class="border-t pt-4 mb-4"><div class="flex justify-between mb-3"><h3 class="section-title">Bekannte Fehler</h3><button class="btn btn-sm" onclick="addKnownIssue()">+ Hinzufügen</button></div>${r.knownIssues.map(i=>state.resolvingIssueId===i.id?`<div class="space-y-3"><div class="edit-row edit-row-done"><h4 class="font-semibold text-green-800 mb-2">✓ Fehler als gelöst markieren</h4><p class="text-sm text-green-700 mb-3">Fehler: <strong>${esc(i.title)}</strong></p><div class="space-y-2"><label class="block text-sm font-medium text-gray-700">In Version gelöst (optional):</label><input type="text" value="${escInput(state.resolveVersion)}" oninput="state.resolveVersion=this.value" placeholder="${r.version}" class="w-full px-3 py-2 border rounded"/><label class="block text-sm font-medium text-gray-700 mt-3">Beschreibung der Lösung (optional):</label><textarea oninput="state.resolvingSolution=this.value" placeholder="Beschreibe wie der Fehler gelöst wurde..." class="w-full px-3 py-2 border rounded" rows="3">${escInput(state.resolvingSolution)}</textarea></div><div class="flex gap-2 mt-3"><button class="btn btn-primary" onclick="confirmResolveIssue()">${state.resolvingSolution.trim()?'Lösung dokumentieren':'Als gelöst markieren'}</button><button class="btn" onclick="cancelResolveIssue()">Abbrechen</button></div></div></div>`:i.status==='resolved'?`<div class="edit-row edit-row-done"><div class="flex gap-2 mb-2 items-start"><span class="chip chip-done">✓ Gelöst in ${esc(i.resolvedInVersion||'?')}</span><div class="flex-1"><div class="font-medium text-gray-600 line-through">${esc(i.title)}</div>${i.resolution?`<p class="text-sm text-gray-600">${esc(i.resolution)}</p>`:''}</div><button class="btn btn-sm" onclick="reopenIssue(${i.id})" title="Fehler wieder öffnen">Wieder öffnen</button></div></div>`:`<div class="edit-row edit-row-issue"><div class="flex gap-2 mb-2"><input type="text" value="${escInput(i.title)}" oninput="updateKnownIssue(${i.id},'title',this.value)" placeholder="Fehler..." class="flex-1 px-2 py-1 rounded"/><select onchange="updateKnownIssue(${i.id},'category',this.value)" class="px-2 py-1 rounded">${[...state.categories].sort((a,b)=>a.label.localeCompare(b.label,'de')).map(cat=>`<option value="${cat.id}" ${(i.category||'general')===cat.id?'selected':''}>${cat.label}</option>`).join('')}</select><button class="btn btn-sm btn-success" onclick="startResolveIssue(${i.id})" title="Als gelöst markieren">✓ Gelöst</button><button class="btn-icon btn-icon-danger" title="Entfernen" aria-label="Entfernen" onclick="removeKnownIssue(${i.id})">×</button></div><textarea oninput="updateKnownIssue(${i.id},'details',this.value)" placeholder="Details..." class="w-full px-2 py-1 rounded" rows="2">${escInput(i.details||'')}</textarea></div>`).join('')}${r.knownIssues.length===0?'<p class="text-gray-500 italic">Keine bekannten Fehler</p>':''}</div><div class="border-t pt-4"><label class="block text-sm font-medium mb-2">Kommentare (optional)</label><textarea oninput="state.editingRelease.comments=this.value" class="w-full px-3 py-2 rounded" rows="3" placeholder="Zusätzliche Informationen...">${escInput(r.comments||'')}</textarea></div><div class="border-t pt-4 mt-4 flex justify-end"><button class="btn btn-danger" onclick="deleteCurrentRelease()">Release vollständig löschen</button></div>`}else if(t==='settings'){c.innerHTML=`<div class="flex justify-between items-center mb-6"><h2 class="dialog-title">Einstellungen</h2><button class="btn" onclick="hideModal()">Schließen</button></div><div class="panel mb-4"><h3 class="panel-title">Darstellung</h3><p class="text-sm text-gray-600 mb-3">„Automatisch“ übernimmt das aktive Home-Assistant-Theme, außerhalb von Home Assistant die Systemeinstellung.</p><div class="seg" role="group" aria-label="Darstellung" data-theme-switch>${themeSwitchButtons()}</div></div><div class="panel mb-4"><h3 class="panel-title">Automatische Update-Dokumentation</h3><p class="text-sm text-gray-600 mb-3">Erstellt automatisch Release-Notes-Einträge, wenn Home-Assistant-Update-Entitäten ein Update abschließen oder neu hinzukommen/verschwinden.</p><label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" ${state.settings.autoUpdateDocs?'checked':''} onchange="toggleAutoUpdateDocs(this.checked)"/><span class="text-sm">Automatische Update-Dokumentation aktiviert</span></label></div><div class="panel mb-4"><h3 class="panel-title">Daten</h3><p class="text-sm text-gray-600 mb-3">Datenstand sichern oder aus einer Sicherung wiederherstellen.</p><div class="flex gap-2"><button class="btn" onclick="exportData()">Exportieren</button><button class="btn" onclick="document.getElementById('import-file-input').click()">Importieren</button></div></div>`}}
 async function toggleAutoUpdateDocs(enabled){state.settings.autoUpdateDocs=enabled;await saveData()}
 function esc(t){const d=document.createElement('div');d.textContent=t||'';return d.innerHTML.replace(/\n/g,'<br>')}
 // Für editierbare Felder (value=""/<textarea>): NICHT \n->br wandeln, sonst
@@ -429,49 +510,31 @@ function esc(t){const d=document.createElement('div');d.textContent=t||'';return
 function escInput(t){const d=document.createElement('div');d.textContent=t||'';return d.innerHTML}
 function getSummaryBadges(r) {
   const featCount = r.features?.length || 0;
-  
+
   // Zähle Änderungen + gelöste Fehler in dieser Version
   const changesCount = r.changes?.length || 0;
   const resolvedInThisVersion = (r.knownIssues || []).filter(
     i => i.status === 'resolved' && i.resolvedInVersion === r.version
   ).length;
   const changeCount = changesCount + resolvedInThisVersion;
-  
+
   const issueCount = (r.knownIssues || []).filter(i => i.status !== 'resolved').length;
-  
+
+  const chip = (cls, count, label) => '<span class="chip ' + cls + '"><span class="chip-dot"></span>' + count + ' ' + label + '</span>';
   const badges = [];
-  
-  // Badge 1: Features (oder leer)
-  if (featCount > 0) {
-    const label = featCount === 1 ? 'Feature' : 'Features';
-    badges.push('<span class="px-2 py-1 rounded text-xs bg-green-600 text-white badge-features">' + featCount + ' ' + label + '</span>');
-  } else {
-    badges.push('<span></span>');
-  }
-  
-  // Badge 2: Änderungen (oder leer)
-  if (changeCount > 0) {
-    const label = changeCount === 1 ? 'Änderung' : 'Änderungen';
-    badges.push('<span class="px-2 py-1 rounded text-xs bg-blue-500 text-white badge-changes">' + changeCount + ' ' + label + '</span>');
-  } else {
-    badges.push('<span></span>');
-  }
-  
-  // Badge 3: Fehler (oder leer)
-  if (issueCount > 0) {
-    const label = issueCount === 1 ? 'Fehler' : 'Fehler';
-    badges.push('<span class="px-2 py-1 rounded text-xs bg-yellow-500 text-black badge-issues">' + issueCount + ' ' + label + '</span>');
-  } else {
-    badges.push('<span></span>');
-  }
-  
+  if (featCount > 0) badges.push(chip('chip-features', featCount, featCount === 1 ? 'Feature' : 'Features'));
+  if (changeCount > 0) badges.push(chip('chip-changes', changeCount, changeCount === 1 ? 'Änderung' : 'Änderungen'));
+  if (issueCount > 0) badges.push(chip('chip-issues', issueCount, 'Fehler'));
   return badges.join('');
 }
+applyTheme();
+watchTheme();
+document.querySelectorAll('[data-theme-switch]').forEach(el => { el.innerHTML = themeSwitchButtons(); });
 document.getElementById('search-input').addEventListener('input',e=>{state.searchTerm=e.target.value;render()});
 document.getElementById('category-filter').addEventListener('change',e=>{state.filterCategory=e.target.value;render()});
 // Einzige Quelle für die Admin-Version dieser Datei. Nur erhöhen, wenn an
-// DIESER Datei etwas geändert wurde (unabhängig von Backend/Widget-Version).
-const ADMIN_VERSION = '0.6.1';
+// DIESER Datei etwas geändert wurde (unabhängig von der Backend-Version).
+const ADMIN_VERSION = '0.7.0';
 document.title = 'Home Assistant Release Notes Manager - Admin v' + ADMIN_VERSION;
 document.getElementById('version-meta').setAttribute('content', ADMIN_VERSION);
 console.log('🚀 Home Assistant Release Notes Manager (Admin v' + ADMIN_VERSION + ') startet...');
@@ -524,8 +587,8 @@ checkVersionAndReload().then(reloading => {
   </script>
 
   <!-- Versions-Anzeige -->
-  <div id="version-footer" style="position: fixed; bottom: 10px; left: 10px; font-size: 11px; color: #9ca3af; font-family: monospace; z-index: 1000;">
-    Admin: v0.6.1
+  <div id="version-footer" class="version-footer">
+    Admin: v0.7.0
   </div>
 </body>
 </html>

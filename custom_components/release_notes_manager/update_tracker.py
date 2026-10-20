@@ -39,8 +39,8 @@ CACHE_STORAGE_KEY = "release_notes_manager_update_cache"
 LIVE_FLUSH_DELAY = 300  # 5 Minuten - Live erkannte Updates ohne Neustart
 STARTUP_FLUSH_DELAY = 120  # 2 Minuten ab EVENT_HOMEASSISTANT_STARTED
 
-CATEGORY_UPDATE = {"id": "update", "label": "Update", "color": "bg-gray-200 text-gray-800"}
-CATEGORY_INTEGRATION = {"id": "integration", "label": "Integration / Addon", "color": "bg-blue-600 text-white"}
+CATEGORY_UPDATE = {"id": "update", "label": "Update", "color": "gray"}
+CATEGORY_INTEGRATION = {"id": "integration", "label": "Integration / Addon", "color": "blue-dark"}
 
 VERSION_PATTERN = re.compile(r"^(\d{4})\.(\d{1,2})\.(\d+)$")
 

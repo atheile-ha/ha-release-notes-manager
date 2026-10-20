@@ -1,6 +1,8 @@
 """REST API endpoints for Release Notes Manager."""
+import hashlib
 import logging
 import json
+from pathlib import Path
 from aiohttp import web
 from homeassistant.components.http import HomeAssistantView
 from homeassistant.core import HomeAssistant
@@ -8,13 +10,48 @@ from homeassistant.core import HomeAssistant
 _LOGGER = logging.getLogger(__name__)
 
 
+class ReleaseNotesPageView(HomeAssistantView):
+    """
+    Handle /release-notes/release-notes.html - Admin-Interface.
+
+    Ersetzt die frühere StaticPathConfig mit cache_headers=False: die sendete
+    gar keinen Cache-Control-Header, sodass Browser und Companion-App die Seite
+    nach eigener Schätzung zwischenspeichern durften. Jetzt fragt der Browser bei
+    jedem Aufruf per ETag nach und bekommt bei unveränderter Datei nur ein 304.
+    Ausgeliefert wird ausschließlich diese Seite, nicht das ganze
+    Integrationsverzeichnis.
+    """
+
+    url = "/release-notes/{filename}"
+    name = "release_notes_manager:page"
+    requires_auth = False  # iframe/Dashboard-Tab kann kein Token mitsenden
+
+    PAGES = ("release-notes.html",)
+
+    def __init__(self, hass: HomeAssistant):
+        """Initialize view."""
+        self._hass = hass
+        self._dir = Path(__file__).parent
+
+    async def get(self, request, filename):
+        """Return the page with revalidation headers."""
+        if filename not in self.PAGES:
+            raise web.HTTPNotFound()
+        body = await self._hass.async_add_executor_job((self._dir / filename).read_bytes)
+        etag = '"' + hashlib.sha256(body).hexdigest()[:16] + '"'
+        headers = {"Cache-Control": "no-cache", "ETag": etag}
+        if request.headers.get("If-None-Match") == etag:
+            return web.Response(status=304, headers=headers)
+        return web.Response(body=body, content_type="text/html", charset="utf-8", headers=headers)
+
+
 class ReleaseNotesVersionView(HomeAssistantView):
     """
     Handle /api/release_notes_manager/version
-    - GET to get current versions of backend, admin dashboard and widget
+    - GET to get current versions of backend and admin dashboard
 
     Used by each frontend for auto-reload on its own version mismatch.
-    Backend, Admin-Dashboard und Widget werden unabhängig voneinander
+    Backend und Admin-Dashboard werden unabhängig voneinander
     versioniert - jede Datei hat ihre eigene Versionsnummer, die nur bei
     tatsächlichen Änderungen an genau dieser Datei erhöht wird.
     """
@@ -29,7 +66,7 @@ class ReleaseNotesVersionView(HomeAssistantView):
         self._versions = versions
 
     async def get(self, request):
-        """Return current backend/admin/widget versions."""
+        """Return current backend/admin versions."""
         return web.json_response(self._versions, headers={
             'Cache-Control': 'no-cache, no-store, must-revalidate',
             'Pragma': 'no-cache',
@@ -131,9 +168,14 @@ def register_api_views(hass: HomeAssistant, storage, versions: dict) -> None:
     """
     Register all API views.
 
-    versions: dict mit den Keys "backend", "admin", "widget" - siehe
+    versions: dict mit den Keys "backend" und "admin" - siehe
     __init__.py für die Versionierungs-Konvention.
     """
+    # HTML page (Admin)
+    page_view = ReleaseNotesPageView(hass)
+    hass.http.register_view(page_view)
+    _LOGGER.info("Registered page view: %s", page_view.url)
+
     # Data endpoint
     data_view = ReleaseNotesDataView(hass, storage)
     hass.http.register_view(data_view)

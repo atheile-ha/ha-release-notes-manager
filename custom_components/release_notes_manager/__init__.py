@@ -1,25 +1,29 @@
 """Release Notes Manager Integration - HA-konform modernisiert."""
+import hashlib
 import logging
 from pathlib import Path
+from homeassistant.components import frontend
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.components.http import StaticPathConfig
+from homeassistant.loader import async_get_integration
+from homeassistant.util import dt as dt_util
 
+from .const import CARD_BUNDLE_FILENAME, CARD_STATIC_URL_PATH, DOMAIN
 from .storage import get_storage
 from .api import register_api_views
 from .update_tracker import async_setup_update_tracker
+from .websocket import async_register_websocket_commands
 
 _LOGGER = logging.getLogger(__name__)
-DOMAIN = "release_notes_manager"
 
-# Drei unabhängige Versionsstände. Jede Konstante wird NUR erhöht, wenn an der
+# Zwei unabhängige Versionsstände. Jede Konstante wird NUR erhöht, wenn an der
 # jeweiligen Datei tatsächlich etwas geändert wurde - nicht automatisch bei
-# jedem Release. manifest.json/hacs.json führen zusätzlich die übergreifende
-# Paket-/Release-Version (für HACS), die von diesen dreien unabhängig ist.
-BACKEND_VERSION = "0.6.3"   # __init__.py, api.py, storage.py, update_tracker.py
-ADMIN_VERSION = "0.6.1"     # release-notes.html (Eingabe-Dashboard)
-WIDGET_VERSION = "0.5.4"    # release-notes-widget.html (Read-only-Dashboard)
+# jedem Release. manifest.json führt zusätzlich die übergreifende
+# Paket-/Release-Version (für HACS), die auch die Dashboard-Karte verwendet.
+BACKEND_VERSION = "0.7.0"   # __init__.py, api.py, storage.py, update_tracker.py, websocket.py
+ADMIN_VERSION = "0.7.0"     # release-notes.html (Eingabe-Dashboard)
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """
@@ -40,15 +44,15 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         'storage': storage,
     }
 
-    # Register static frontend assets (served from integration)
-    await async_register_static_paths(hass)
-
-    # Register API endpoints
+    # Register API endpoints (inkl. Auslieferung des Admin-Interfaces unter /release-notes)
     register_api_views(hass, storage, {
         "backend": BACKEND_VERSION,
         "admin": ADMIN_VERSION,
-        "widget": WIDGET_VERSION,
     })
+
+    # Dashboard-Karte (custom:release-notes-card) und ihre Websocket-Befehle
+    async_register_websocket_commands(hass)
+    await async_register_card(hass)
 
     # Automatische Update-Dokumentation ueber update.*-Entitaeten
     await async_setup_update_tracker(hass, storage)
@@ -57,46 +61,46 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     _LOGGER.info(
         "Access Admin at: /release-notes/release-notes.html"
     )
-    _LOGGER.info(
-        "Access Widget at: /release-notes/release-notes-widget.html"
-    )
     
     return True
 
 
-async def async_register_static_paths(hass: HomeAssistant) -> None:
+def _bundle_digest(path: Path) -> str | None:
+    """Return a short digest of the bundle file, or None if it cannot be read."""
+    try:
+        return hashlib.sha256(path.read_bytes()).hexdigest()[:12]
+    except OSError:
+        return None
+
+
+async def async_register_card(hass: HomeAssistant) -> None:
     """
-    Register static frontend assets to be served by HA HTTP server.
-    
-    Technical Decision: StaticPathConfig vs Panel
-    - StaticPathConfig chosen because:
-      * Simple file serving without HA sidebar integration
-      * Allows direct URL access (/release-notes/...)
-      * No need for panel registration (sidebar clutter)
-      * Compatible with iframe dashboard cards
-      * Follows HA best practice for custom frontend assets
-    
-    Assets are served directly from integration directory:
-    - /release-notes/release-notes.html (Admin)
-    - /release-notes/release-notes-widget.html (Widget)
-    
-    No files are copied to /config/www anymore.
+    Serve the card bundle and load it into every dashboard.
+
+    Die URL trägt Paketversion, einen Hash des Bundles und den Startzeitpunkt
+    von HA. Browser und Companion-App laden das Bundle dadurch nach jedem Update
+    und jedem Neustart neu, obwohl es mit Cache-Headern ausgeliefert wird - ein
+    manueller ?=vX-Parameter wie bei der iframe-Karte entfällt.
     """
-    integration_path = Path(__file__).parent
-    
-    # Register static path for frontend assets
-    await hass.http.async_register_static_paths([
-        StaticPathConfig(
-            url_path="/release-notes",
-            path=str(integration_path),
-            cache_headers=False  # Always serve latest version (no cache)
-        )
-    ])
-    
-    _LOGGER.info(
-        "Frontend assets registered: /release-notes/ → %s",
-        integration_path
+    if "frontend" not in hass.config.components:
+        _LOGGER.warning("The frontend integration is not loaded; the dashboard card is unavailable")
+        return
+
+    integration = await async_get_integration(hass, DOMAIN)
+    bundle_path = Path(__file__).parent / "frontend" / CARD_BUNDLE_FILENAME
+    digest = await hass.async_add_executor_job(_bundle_digest, bundle_path)
+    if digest is None:
+        _LOGGER.warning("The card bundle %s cannot be read", bundle_path)
+    bundle_url = f"{CARD_STATIC_URL_PATH}?v={integration.version}"
+    if digest is not None:
+        bundle_url += f"&h={digest}"
+    bundle_url += f"&s={int(dt_util.utcnow().timestamp())}"
+
+    await hass.http.async_register_static_paths(
+        [StaticPathConfig(CARD_STATIC_URL_PATH, str(bundle_path), cache_headers=True)]
     )
+    frontend.add_extra_js_url(hass, bundle_url)
+    _LOGGER.info("Dashboard card registered: %s", bundle_url)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

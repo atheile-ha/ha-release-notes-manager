@@ -1,5 +1,61 @@
 # Changelog - Release Notes Manager
 
+## [0.7.0] - 2026-10-21
+
+### ⚠️ Breaking Changes
+
+**Widget-Seite entfernt - iframe-Card durch die Dashboard-Karte ersetzen**
+- `release-notes-widget.html` gibt es nicht mehr, eine bestehende iframe-Card zeigt nach dem Update einen 404-Fehler
+- Ersetzen durch:
+  ```yaml
+  type: custom:release-notes-card
+  ```
+- Der Einstellungsbereich des alten Widgets (Auto-Collapse-Regler) entfällt; die Zeit wird jetzt über die Option `auto_collapse` der Karte gesetzt
+
+### 🎉 Neue Features
+
+**Dashboard-Karte `custom:release-notes-card` statt iframe-Card**
+- Das Widget ist jetzt eine eigene Lovelace-Karte nach dem Muster von [ha_ev-charge-record](https://github.com/atheile-ha/ha_ev-charge-record) und erscheint in der Kartenauswahl unter „Release Notes“
+- Die Karte aktualisiert sich sofort, wenn im Admin-Interface gespeichert oder ein Update automatisch dokumentiert wird: Jedes Speichern im Storage sendet ein Signal, die Karte lädt über eine Websocket-Subscription neu
+- Zusätzlich lädt sie alle 10 Minuten still nach und nach einer wiederhergestellten Verbindung (z. B. HA-Neustart); schlägt ein stilles Nachladen fehl, bleiben die bisherigen Daten stehen
+- Optionen: `title`, `count` (Releases beim Öffnen, 1-50) und `auto_collapse` (Sekunden bis zum Zurückklappen auf das neueste Release, 0 = aus) - ersetzen den Einstellungsbereich des alten Widgets
+
+**Neues Design mit Light- und Dark-Mode**
+- Admin-Interface und Karte verwenden die Theme-Variablen von Home Assistant statt fest eingetragener Farben
+- Die Karte folgt direkt dem aktiven HA-Theme. Das Admin-Interface übernimmt es im Modus „Automatisch“ (die Seite läuft same-origin im iframe), außerhalb von HA die Systemeinstellung; unter **Einstellungen → Darstellung** auch manuell auf Hell oder Dunkel umschaltbar
+- Kartenaufbau angelehnt an ha_ev-charge-record: Zusammenfassung als Chips in den HA-Statusfarben, Details mit Aufklapp-Pfeil, Chip „Aktuell“ statt blauem Kopfbereich für das neueste Release (nach Datum), Abschnittsüberschriften ohne Emojis
+- Kategorie-Farbauswahl klappt direkt unter der Kategorie im Dialog auf statt als Popup
+
+**Kategorie-Farben für beide Themes**
+- Jede der 11 Farben hat ein eigenes Paar aus Hintergrund und Schrift für Hell und Dunkel, alle mit Kontrast von mindestens 4,5:1 (WCAG); „Weiß“ wird im Dark Mode zur Kontur, „Schwarz“ kehrt sich um
+- Gespeichert wird nur noch die Farb-ID (`red`, `blue-dark` …) statt Tailwind-Klassen wie `bg-red-100 text-red-800`
+
+### 🐛 Bugfixes
+
+**Widget übernahm neue Daten erst nach manuellem Neuladen**
+- Die Aktualisierung alle 10 Sekunden beobachtete einen `localStorage`-Schlüssel (`ha_releases`), den seit der Umstellung auf HA-Storage nichts mehr schreibt - neue Releases erschienen deshalb erst nach einem Neuladen der Seite
+- Die Karte bekommt Änderungen jetzt per Websocket
+
+**Gecachte Seiten nach einem Update / manueller `?=vX`-Parameter**
+- Die Seiten wurden mit `cache_headers=False` ausgeliefert, also ganz ohne `Cache-Control`-Header - Browser und Companion-App durften sie nach eigener Schätzung zwischenspeichern; die `<meta http-equiv>`-Tags wirken auf den HTTP-Cache nicht
+- Das Admin-Interface kommt jetzt über eine eigene View mit `Cache-Control: no-cache` und ETag (bei unveränderter Datei nur `304`), das Karten-Bundle über eine URL mit Paketversion, Datei-Hash und HA-Startzeit - der `?=vX.X.X`-Parameter in den Dashboard-URLs wird nicht mehr benötigt
+
+### 🔒 Sicherheit
+
+- Unter `/release-notes/` war bisher das gesamte Integrationsverzeichnis abrufbar (inkl. Python-Quellen); ausgeliefert wird jetzt nur noch `release-notes.html`
+- Die Karte liest über die angemeldete Websocket-Verbindung statt über die offene REST-API
+
+### 🔧 Technisch
+
+- Migration: Gespeicherte Farbklassen werden beim Laden anhand des Farbtons auf Farb-IDs abgebildet (auch Backend-Standards wie `bg-teal-500`, unbekannte Werte → Grau); das Admin-Interface speichert die Umstellung einmalig, die Karte stellt nur für die Anzeige um. Standardkategorien und Kategorien des Update-Trackers verwenden jetzt Farb-IDs
+- Neu: `websocket.py` (`release_notes_manager/data`, `release_notes_manager/subscribe`), `const.py`, `frontend/` (Lit + TypeScript + Vite, Tests mit vitest); das gebaute Bundle `custom_components/release_notes_manager/frontend/release-notes-card.js` ist eingecheckt
+- `manifest.json`: `after_dependencies` für `frontend`, `http`, `websocket_api`
+- Backend-Version: v0.7.0 (`__init__.py`, `api.py`, `storage.py`, `update_tracker.py`, `websocket.py`)
+- Admin-Version: v0.7.0 (`release-notes.html`)
+- Widget-Version: entfällt (`release-notes-widget.html` entfernt, ersetzt durch die Karte)
+
+---
+
 ## [0.6.4] - 2026-08-19
 
 ### 🐛 Bugfix

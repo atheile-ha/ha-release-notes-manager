@@ -40,3 +40,6 @@ tests/
 # Local tooling / planning notes (not part of the project)
 .claude/
 .plan.md
+
+# Frontend build tooling
+node_modules/

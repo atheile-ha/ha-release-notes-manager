@@ -9,43 +9,50 @@ Ein elegantes Tool zur Verwaltung und Anzeige von Release Notes direkt in Home A
 - 📋 **Release-Verwaltung** - Versionen, Kategorien, Status-Tracking
 - ⚠️ **Known Issues** - Bekannte Probleme dokumentieren, verfolgen und beim nächsten Release automatisch übernehmen
 - 🎨 **Admin-Interface (Eingabe-Dashboard)** - Vollständiges Verwaltungs-Interface zum Erstellen und Bearbeiten von Releases
-- 🖥️ **Dashboard-Widget (Read-only-Dashboard)** - Kompakte Anzeige der neuesten Releases
+- 🖥️ **Dashboard-Karte** (`custom:release-notes-card`) - Kompakte Anzeige der neuesten Releases, aktualisiert sich sofort nach jedem Speichern
+- 🌓 **Light/Dark Mode** - Folgt dem aktiven Home-Assistant-Theme, im Admin-Interface manuell umschaltbar
 - 🔍 **Suche & Filter** - Schnell das richtige Release finden
-- 🔄 **Auto-Reload** - Beide Dashboards prüfen ihre jeweilige Version gegen das Backend
+- 🔄 **Immer aktuell** - Karte und Seiten werden nach einem Update ohne manuelles Cache-Leeren neu geladen
 - 🔧 **Einstellungen** - Popup im Admin-Interface, u.a. mit Export/Import des Datenstands als JSON
 - 🖱️ **Drag'n'Drop** - Einträge im Admin-Interface zwischen "Neue Features" und "Änderungen/Bugfixes" verschieben und innerhalb eines Bereichs umsortieren
 - 🔄 **Automatische Update-Dokumentation** - Beobachtet alle `update.*`-Entitäten der Instanz und legt bei abgeschlossenen Updates sowie neu hinzugekommenen/entfernten Integrationen automatisch passende Release-Notes-Einträge an (ein-/ausschaltbar in den Einstellungen)
 
-**⚠️ Wichtiger Hinweis zu Dashboard-URLs**
+**⚠️ Umstieg von der iframe-Card (bis v0.6.x)**
 
-Home Assistant cached Dashboard-Kacheln (Dashboard-Tab und iframe-Card) intern und lädt ein aktualisiertes Front-End nicht automatisch nach. Deshalb wird in den URLs unten ein `?=vX.X.X`-Parameter mit der aktuellen Admin- bzw. Widget-Version mitgegeben - nach einem Update muss dieser Parameter manuell angepasst werden (siehe [Troubleshooting](#-troubleshooting)).
+Das Dashboard-Widget ist ab v0.7.0 eine eigene Karte, die alte Widget-Seite (`release-notes-widget.html`) gibt es nicht mehr. Ersetze die bisherige iframe-Card durch `type: custom:release-notes-card` (siehe [Konfiguration](#️-konfiguration)). Der `?=vX.X.X`-Parameter in den URLs wird nicht mehr benötigt.
 
-## 🆕 Version 0.6.4
+## 🆕 Version 0.7.0
+
+### ⚠️ Breaking Change
+
+Die Widget-Seite `release-notes-widget.html` wurde entfernt. Bestehende iframe-Cards zeigen nach dem Update einen 404-Fehler und müssen durch `type: custom:release-notes-card` ersetzt werden (siehe [Konfiguration](#️-konfiguration)).
 
 ### Neu in dieser Version:
 
-✅ **Automatische Update-Dokumentation über Home-Assistant-Update-Entitäten** (v0.6.0)
-- Abgeschlossene Updates werden automatisch als Eintrag `"[alte Version] → [neue Version]"` in der Kategorie "Update" dokumentiert
-- Neu hinzukommende bzw. verschwindende `update.*`-Entitäten (Integration/Add-on installiert bzw. deinstalliert) werden ebenfalls automatisch erfasst
-- Erkennung funktioniert zuverlässig auch bei Updates, die einen HA-Neustart erfordern
-- Ein-/ausschaltbar über den neuen Bereich "🔄 Automatische Update-Dokumentation" in den Einstellungen (⚙️) des Admin-Interfaces
+✅ **Dashboard-Karte statt iframe-Card**
+- Das Widget ist jetzt eine eigene Lovelace-Karte (`custom:release-notes-card`) wie in ha_ev-charge-record und erscheint in der Kartenauswahl - keine iframe-Card mehr nötig
+- Sie aktualisiert sich sofort, sobald im Admin-Interface gespeichert oder ein Update automatisch dokumentiert wird
+- Die Daten kommen über die angemeldete Websocket-Verbindung von Home Assistant
+- Optionen `title`, `count` und `auto_collapse` (siehe [Konfiguration](#️-konfiguration))
 
-🐛 **Bugfix (v0.6.1):** Entitäten, deren Version beim HA-Start noch nicht bekannt war, lösten fälschlich einen `"? → ..."`-Eintrag aus, sobald ihr erster echter Wert eintraf. Das wird jetzt korrekt als bloßes Nachtragen der Baseline erkannt, ohne Eintrag.
+✅ **Neues Design mit Light- und Dark-Mode**
+- Admin-Interface und Karte folgen dem aktiven Home-Assistant-Theme; im Admin-Interface unter **Einstellungen → Darstellung** auch manuell auf Hell oder Dunkel umschaltbar
+- Kartenaufbau angelehnt an [ha_ev-charge-record](https://github.com/atheile-ha/ha_ev-charge-record): Chips für die Zusammenfassung, aufklappbare Details, Chip „Aktuell“ für das neueste Release
+- Kategorie-Farben sind für beide Themes abgestimmt (Kontrast mindestens 4,5:1); gespeicherte Farben werden beim ersten Öffnen des Admin-Interfaces automatisch umgestellt
 
-🐛 **Bugfix (v0.6.2):** Automatisch angelegte Releases übernehmen jetzt offene bekannte Fehler als Vorschlag, genau wie beim manuellen Anlegen eines Releases im Admin-Dashboard.
-
-🐛 **Bugfix (v0.6.3):** Ein Update konnte doppelt dokumentiert werden - vor allem bei Updates, die einen HA-Neustart erfordern (u.a. der Release Notes Manager selbst). Live-Erkennung und Erkennung beim HA-Start liefen in zwei getrennten Warteschlangen und konnten denselben Versionswechsel jeweils einzeln schreiben. Es gibt jetzt nur noch eine Warteschlange pro Entität, jedes Ereignis wird vor dem Schreiben gegen den aktuellen Zustand gegengeprüft, und ein bereits identisch vorhandener Eintrag wird übersprungen. Im selben Zug behoben: eine beim HA-Start noch nicht geladene Integration wurde fälschlich als "Deinstallation" dokumentiert.
-
-🐛 **Bugfix (v0.6.4):** Offene bekannte Fehler konnten aus der Vorschlagsliste für neue Releases verschwinden, wenn zwischenzeitlich ein älterer Release erneut gespeichert wurde (dessen `knownIssues`-Liste den Fehler noch nicht enthielt). Die globale Liste wird beim Speichern jetzt aus allen Releases neu aufgebaut statt durch den zuletzt gespeicherten Release überschrieben zu werden - bestehende Datenstände heilen sich beim nächsten Speichern automatisch selbst.
+✅ **Kein manueller Cache-Parameter mehr**
+- Der `?=vX.X.X`-Parameter in den Dashboard-URLs entfällt: Karte und Seiten werden nach einem Update automatisch neu geladen
 
 Vollständige Versionshistorie: [CHANGELOG.md](CHANGELOG.md)
 
 ## 🏗️ Architektur
 
 - **HA-Storage basiert:** Daten werden in Home Assistant's offiziellem Storage-System (`/config/.storage/release_notes_manager`) gespeichert
-- **Frontend-Serving direkt aus der Integration:** kein Kopieren nach `/config/www/` nötig, URLs unter `/release-notes/`
-- **API:** `GET`/`POST /api/release_notes_manager/data` zum Laden/Speichern, `GET /api/release_notes_manager/version` liefert die aktuellen Versionsstände von Backend, Admin- und Widget-Dashboard
-- **Drei unabhängige Versionsstände:** Backend, Admin-Dashboard (`release-notes.html`) und Widget-Dashboard (`release-notes-widget.html`) haben jeweils eigene Versionsnummern, die nur erhöht werden, wenn an genau dieser Datei etwas geändert wurde. Die Paketversion in `manifest.json`/`hacs.json` wird davon unabhängig bei jedem Release hochgezählt.
+- **Dashboard-Karte:** ein Bundle (`frontend/release-notes-card.js`), das Home Assistant in jedes Dashboard lädt. Die URL enthält Paketversion, Datei-Hash und HA-Startzeit, damit Browser und Companion-App nach einem Update die neue Fassung laden
+- **Websocket:** `release_notes_manager/data` liefert Releases und Kategorien, `release_notes_manager/subscribe` meldet jedes Speichern an die Karte (nur für angemeldete Benutzer)
+- **Admin-Interface direkt aus der Integration:** unter `/release-notes/release-notes.html`, ausgeliefert mit `Cache-Control: no-cache` und ETag; kein Kopieren nach `/config/www/` nötig
+- **REST-API:** `GET`/`POST /api/release_notes_manager/data` zum Laden/Speichern im Admin-Interface, `GET /api/release_notes_manager/version` liefert die Versionsstände von Backend und Admin-Interface
+- **Unabhängige Versionsstände:** Backend und Admin-Interface (`release-notes.html`) haben jeweils eigene Versionsnummern, die nur erhöht werden, wenn an genau dieser Datei etwas geändert wurde. Die Paketversion in `manifest.json` wird davon unabhängig bei jedem Release hochgezählt; die Karte verwendet die Paketversion.
 
 ## 🚀 Installation
 
@@ -76,26 +83,30 @@ logger:
     custom_components.release_notes_manager: debug
 ```
 
-**Dashboard-Widget (iframe-Card):**
+**Dashboard-Karte:**
+
+Die Karte steht nach dem Neustart in der Kartenauswahl unter „Release Notes“ zur Verfügung, oder in YAML:
 ```yaml
-type: iframe
-url: /release-notes/release-notes-widget.html?=v0.5.4
-aspect_ratio: 200%
+type: custom:release-notes-card
+# Optional:
+title: Release Notes   # Überschrift der Karte
+count: 1               # Anzahl Releases beim Öffnen (1-50)
+auto_collapse: 30      # Sekunden nach der letzten Bedienung, bis die Karte auf das neueste Release zurückklappt (0 = aus)
 ```
+
+Die Karte lädt über die angemeldete Websocket-Verbindung von Home Assistant und aktualisiert sich sofort, wenn im Admin-Interface gespeichert oder ein Update automatisch dokumentiert wird. Sie folgt dem aktiven Theme (hell/dunkel).
 
 **Admin-Interface als Dashboard-Tab:**
 ```yaml
 title: Release Notes
 icon: mdi:note-text
-url: /release-notes/release-notes.html?=v0.6.1
+url: /release-notes/release-notes.html
 ```
 
 **Admin-Interface direkt im Browser:**
 ```
-http://DEINE-IP:8123/release-notes/release-notes.html?=v0.6.1
+http://DEINE-IP:8123/release-notes/release-notes.html
 ```
-
-Die Versionsnummer im `?=vX.X.X`-Parameter muss zur jeweils aktuellen **Widget**- bzw. **Admin**-Version passen (nicht zur Backend- oder Paketversion) - siehe [CHANGELOG.md](CHANGELOG.md).
 
 ## 📖 Verwendung
 
@@ -112,7 +123,7 @@ Die Versionsnummer im `?=vX.X.X`-Parameter muss zur jeweils aktuellen **Widget**
 
 ### Known Issue hinzufügen
 
-1. Release öffnen (✏️)
+1. Release bearbeiten (Stift-Symbol)
 2. Zu **"Bekannte Fehler"** scrollen
 3. **"+ Hinzufügen"** klicken
 4. Titel und Details eingeben
@@ -136,22 +147,20 @@ Läuft standardmäßig aktiviert im Hintergrund und benötigt keine Konfiguratio
 - Beim ersten Aktivieren wird nur eine stille Bestandsaufnahme durchgeführt, es entstehen keine rückwirkenden Einträge für bereits installierte Komponenten
 - Jedes Ereignis wird pro Entität nur einmal vorgemerkt und vor dem Schreiben nochmals gegen den aktuellen Zustand geprüft - Updates mit Neustart, kurzzeitig nicht verfügbare Entitäten oder spät ladende Integrationen erzeugen dadurch weder doppelte noch falsche Einträge
 
-**Ein-/Ausschalten:** Admin-Interface → ⚙️ **Einstellungen** → Abschnitt "🔄 Automatische Update-Dokumentation"
+**Ein-/Ausschalten:** Admin-Interface → **Einstellungen** → Abschnitt „Automatische Update-Dokumentation“
 
 ## 🐛 Troubleshooting
 
 ### Releases werden nicht angezeigt / Dashboard zeigt eine alte Version
 
-**Lösung 1: Versionsnummer in der Dashboard-URL prüfen**
+**Lösung 1: Seite neu laden**
 
-Die URL muss die aktuelle Admin-/Widget-Version referenzieren (siehe [Konfiguration](#️-konfiguration)), sonst liefert Home Assistant eine gecachte, alte Kachel aus.
-
-**Lösung 2: Browser-Cache leeren**
+Karte und Seiten werden nach einem Update automatisch neu geladen. Zeigt die Companion-App nach einem Update oder Neustart „Karte nicht gefunden“, die App einmal vollständig schließen und neu öffnen. Im Browser hilft notfalls:
 ```
 Strg + Shift + R (Hard Reload)
 ```
 
-**Lösung 3: Logs prüfen**
+**Lösung 2: Logs prüfen**
 ```
 Einstellungen → System → Protokolle
 Suche: "release_notes_manager"
@@ -184,6 +193,16 @@ fetch('/api/release_notes_manager/data')
   .then(d => console.log(d))
 ```
 
+## 🛠️ Entwicklung
+
+Die Dashboard-Karte liegt als TypeScript-Quelle (Lit) in `frontend/` und wird mit Vite zu `custom_components/release_notes_manager/frontend/release-notes-card.js` gebaut. Das Bundle ist eingecheckt, damit HACS es ohne Node ausliefert - nach Änderungen an `frontend/src` neu bauen und mit committen:
+
+```bash
+cd frontend
+npm install
+npm run typecheck && npm test && npm run build
+```
+
 ## 🤝 Support
 
 - [GitHub Issues](https://github.com/atheile-ha/ha-release-notes-manager/issues)
@@ -197,5 +216,5 @@ MIT License - siehe [LICENSE](LICENSE)
 
 Entwickelt für die Home Assistant Community 🏠
 
-**Version:** 0.6.4  
+**Version:** 0.7.0  
 **Repository:** https://github.com/atheile-ha/ha-release-notes-manager

@@ -4,7 +4,10 @@ import json
 from pathlib import Path
 from typing import Any
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.storage import Store
+
+from .const import SIGNAL_DATA_UPDATED
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -145,8 +148,10 @@ class ReleaseNotesStorage:
         try:
             # Save to HA-Storage (atomic write with backup)
             await self._store.async_save(data)
-            
+
             _LOGGER.info("Data saved to HA-Storage successfully")
+            # Dashboard-Karten über die Websocket-Subscription benachrichtigen
+            async_dispatcher_send(self._hass, SIGNAL_DATA_UPDATED)
             return True
             
         except Exception as e:
@@ -156,17 +161,17 @@ class ReleaseNotesStorage:
     def _get_default_categories(self) -> list[dict[str, str]]:
         """Get default categories."""
         return [
-            {"id": "general", "label": "Allgemein", "color": "bg-gray-500"},
-            {"id": "heating", "label": "Heizung", "color": "bg-orange-500"},
-            {"id": "energy", "label": "Energie", "color": "bg-green-500"},
-            {"id": "automation", "label": "Automation", "color": "bg-blue-500"},
-            {"id": "device", "label": "Gerät", "color": "bg-purple-500"},
-            {"id": "integration", "label": "Integration", "color": "bg-pink-500"},
-            {"id": "ui", "label": "UI/UX", "color": "bg-indigo-500"},
-            {"id": "performance", "label": "Performance", "color": "bg-yellow-500"},
-            {"id": "security", "label": "Sicherheit", "color": "bg-red-500"},
-            {"id": "bugfix", "label": "Bugfix", "color": "bg-teal-500"},
-            {"id": "breaking", "label": "Breaking Change", "color": "bg-rose-500"}
+            {"id": "general", "label": "Allgemein", "color": "gray"},
+            {"id": "heating", "label": "Heizung", "color": "orange"},
+            {"id": "energy", "label": "Energie", "color": "green"},
+            {"id": "automation", "label": "Automation", "color": "blue-dark"},
+            {"id": "device", "label": "Gerät", "color": "purple"},
+            {"id": "integration", "label": "Integration", "color": "pink"},
+            {"id": "ui", "label": "UI/UX", "color": "blue-light"},
+            {"id": "performance", "label": "Performance", "color": "yellow"},
+            {"id": "security", "label": "Sicherheit", "color": "red"},
+            {"id": "bugfix", "label": "Bugfix", "color": "green"},
+            {"id": "breaking", "label": "Breaking Change", "color": "pink"}
         ]
 
     def _get_default_settings(self) -> dict[str, Any]:
