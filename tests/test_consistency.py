@@ -35,6 +35,18 @@ class TestManifest:
     def test_domain_matches_folder(self, manifest):
         assert manifest["domain"] == INTEGRATION.name
 
+    def test_keys_are_sorted_like_hassfest_wants(self, manifest):
+        # hassfest: domain, name, danach alphabetisch
+        keys = list(manifest)
+        assert keys[:2] == ["domain", "name"]
+        assert keys[2:] == sorted(keys[2:])
+
+    def test_yaml_setup_declares_a_config_schema(self):
+        # hassfest verlangt ein CONFIG_SCHEMA, wenn die Integration async_setup implementiert
+        init = read(INTEGRATION / "__init__.py")
+        assert "async def async_setup(" in init
+        assert re.search(r"^CONFIG_SCHEMA = cv\.\w+\(", init, re.M)
+
     def test_hacs_json(self):
         hacs = json.loads(read(ROOT / "hacs.json"))
         assert hacs["name"]

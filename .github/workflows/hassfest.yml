@@ -10,8 +10,6 @@ jobs:
   hassfest:
     name: Hassfest
     runs-on: ubuntu-latest
-    # Zunächst nur zur Information: Die Meldungen erst sichten, dann zur Pflicht machen
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: home-assistant/actions/hassfest@master

@@ -1,5 +1,21 @@
 # Changelog - Release Notes Manager
 
+## [0.8.2] - 2026-10-28
+
+### 🐛 Bugfix
+
+**Prüfung durch Home Assistant (hassfest) schlug fehl**
+- `manifest.json`: Schlüssel in der vorgeschriebenen Reihenfolge (domain, name, danach alphabetisch)
+- Die Integration deklariert jetzt ein `CONFIG_SCHEMA` (keine Konfigurationsparameter, `release_notes_manager:` in der `configuration.yaml` genügt weiterhin)
+
+### 🔧 Technisch
+
+- Backend-Version: v0.8.2 (`__init__.py`)
+- Admin-Version: v0.8.1 (unverändert)
+- Karte: unverändert
+
+---
+
 ## [0.8.1] - 2026-10-28
 
 ### 🐛 Bugfixes

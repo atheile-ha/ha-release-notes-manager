@@ -5,6 +5,7 @@ from pathlib import Path
 from homeassistant.components import frontend
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.loader import async_get_integration
@@ -18,11 +19,14 @@ from .websocket import async_register_websocket_commands
 
 _LOGGER = logging.getLogger(__name__)
 
+# Die Integration hat keine Konfigurationsparameter: "release_notes_manager:" genuegt in der configuration.yaml
+CONFIG_SCHEMA = cv.empty_config_schema(DOMAIN)
+
 # Zwei unabhängige Versionsstände. Jede Konstante wird NUR erhöht, wenn an der
 # jeweiligen Datei tatsächlich etwas geändert wurde - nicht automatisch bei
 # jedem Release. manifest.json führt zusätzlich die übergreifende
 # Paket-/Release-Version (für HACS), die auch die Dashboard-Karte verwendet.
-BACKEND_VERSION = "0.8.0"   # __init__.py, api.py, storage.py, update_tracker.py, versioning.py, websocket.py
+BACKEND_VERSION = "0.8.2"   # __init__.py, api.py, storage.py, update_tracker.py, versioning.py, websocket.py
 ADMIN_VERSION = "0.8.1"     # release-notes.html (Eingabe-Dashboard)
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:

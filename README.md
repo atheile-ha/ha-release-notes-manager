@@ -21,13 +21,11 @@ Ein elegantes Tool zur Verwaltung und Anzeige von Release Notes direkt in Home A
 - 🖱️ **Drag'n'Drop** - Einträge im Admin-Interface zwischen "Neue Features" und "Änderungen/Bugfixes" verschieben und innerhalb eines Bereichs umsortieren
 - 🔄 **Automatische Update-Dokumentation** - Beobachtet alle `update.*`-Entitäten der Instanz und legt bei abgeschlossenen Updates sowie neu hinzugekommenen/entfernten Integrationen automatisch passende Release-Notes-Einträge an (ein-/ausschaltbar in den Einstellungen)
 
-## 🆕 Version 0.8.1
+## 🆕 Version 0.8.2
 
-### Bugfixes im Statistik-Popup:
+### Bugfix:
 
-- Auflösung „Tag“ ist wieder wählbar, „Auto“ entfällt, Standard ist „Woche“
-- Kategorien sind standardmäßig eingeklappt (alle aktiv)
-- Bug-Diagramm umschaltbar zwischen allen Bugs im Zeitraum und offenen Bugs am Ende des Zeitraums
+- Die Integration besteht jetzt die Prüfung von Home Assistant (hassfest): Manifest und Konfigurationsschema entsprechen den Vorgaben, an der Konfiguration ändert sich nichts
 
 Vollständige Versionshistorie: [CHANGELOG.md](CHANGELOG.md)
 
@@ -204,5 +202,5 @@ MIT License - siehe [LICENSE](LICENSE)
 
 Entwickelt für die Home Assistant Community 🏠
 
-**Version:** 0.8.1  
+**Version:** 0.8.2  
 **Repository:** https://github.com/atheile-ha/ha-release-notes-manager
