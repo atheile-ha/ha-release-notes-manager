@@ -90,9 +90,9 @@ export const cardStyles = css`
   }
 
   .title svg {
-    width: 24px;
-    height: 24px;
-    color: var(--rn-accent);
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
   }
 
   .icon {

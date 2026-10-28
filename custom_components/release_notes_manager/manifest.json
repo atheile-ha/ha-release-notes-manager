@@ -1,7 +1,7 @@
 {
   "domain": "release_notes_manager",
   "name": "Release Notes Manager",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "documentation": "https://github.com/atheile-ha/ha-release-notes-manager",
   "issue_tracker": "https://github.com/atheile-ha/ha-release-notes-manager/issues",
   "dependencies": [],

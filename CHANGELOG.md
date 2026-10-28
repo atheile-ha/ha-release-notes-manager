@@ -1,5 +1,32 @@
 # Changelog - Release Notes Manager
 
+## [0.8.0] - 2026-10-28
+
+### 🎉 Neue Features
+
+**Statistik-Popup im Admin-Interface**
+- Neuer Button „Statistik“ neben „Kategorien“ zeigt den Zeitverlauf von Releases, Features, Änderungen, neuen Bugs und dem Bestand offener Bugs
+- Zeitraum (3 Monate bis Alles) und Auflösung (Auto, Tag, Woche, Monat, Jahr) wählbar, Darstellung als gestapelte Balken oder Linien
+- Filter nach einer oder mehreren Kategorien, Kennzahlen-Kacheln, Tooltip beim Überfahren und aufklappbare Wertetabelle
+
+**Versionsschema einstellbar**
+- Einstellungen → Versionsschema: `YYYY.MM.ZZ` (wie bisher, Standard) oder `xx.yy.zz` (Major.Minor.Bugfix)
+- Das Schema gilt auch für die automatische Update-Dokumentation: `YYYY.MM.ZZ` zählt im Monat weiter, `xx.yy.zz` erhöht Minor und setzt Bugfix auf 0
+- Schalter „Neue Releases mit nächster Nummer vorausfüllen“ (nur `YYYY.MM.ZZ`, Standard aus)
+- Passt eine eingegebene Version nicht zum Muster, erscheint nur ein Hinweis, Speichern bleibt möglich
+
+**Neues Logo**
+- Ersetzt das Home-Assistant-Symbol in Admin-Interface und Dashboard-Karte, dazu Tab-Icon, README-Banner und Markenbilder für Home Assistant und HACS (ab Home Assistant 2026.3)
+
+### 🔧 Technisch
+
+- Backend-Version: v0.8.0 (`update_tracker.py`, `storage.py`, neu `versioning.py`)
+- Admin-Version: v0.8.0 (`release-notes.html`)
+- Karte: Logo ersetzt das Home-Assistant-Symbol, Bundle neu gebaut
+- Neue Einstellungen `versionScheme` und `versionPrefill`; bestehende Installationen verhalten sich unverändert
+
+---
+
 ## [0.7.0] - 2026-10-21
 
 ### ⚠️ Breaking Changes
@@ -14,16 +41,10 @@
 
 ### 🎉 Neue Features
 
-**Dashboard-Karte `custom:release-notes-card` statt iframe-Card**
-
 **Neues Design mit Light- und Dark-Mode**
 - Admin-Interface und Karte verwenden die Theme-Variablen von Home Assistant statt fest eingetragener Farben
 - Die Karte folgt direkt dem aktiven HA-Theme. Das Admin-Interface übernimmt es im Modus „Automatisch“ (die Seite läuft same-origin im iframe), außerhalb von HA die Systemeinstellung; unter **Einstellungen → Darstellung** auch manuell auf Hell oder Dunkel umschaltbar
 - Kategorie-Farbauswahl klappt direkt unter der Kategorie im Dialog auf statt als Popup
-
-### 🐛 Bugfixes
-
-**Widget übernimmt neue Daten automatisch**
 
 ### 🔒 Sicherheit
 

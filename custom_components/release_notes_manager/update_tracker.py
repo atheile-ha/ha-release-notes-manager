@@ -18,7 +18,6 @@ Doppelte Eintraege werden seit v0.6.3 auf drei Ebenen verhindert:
 from __future__ import annotations
 
 import logging
-import re
 import time
 from datetime import datetime
 from typing import Any
@@ -30,6 +29,7 @@ from homeassistant.helpers.event import async_call_later
 from homeassistant.helpers.storage import Store
 
 from .storage import ReleaseNotesStorage
+from .versioning import get_scheme, next_version
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -41,8 +41,6 @@ STARTUP_FLUSH_DELAY = 120  # 2 Minuten ab EVENT_HOMEASSISTANT_STARTED
 
 CATEGORY_UPDATE = {"id": "update", "label": "Update", "color": "gray"}
 CATEGORY_INTEGRATION = {"id": "integration", "label": "Integration / Addon", "color": "blue-dark"}
-
-VERSION_PATTERN = re.compile(r"^(\d{4})\.(\d{1,2})\.(\d+)$")
 
 
 class UpdateTracker:
@@ -316,7 +314,9 @@ class UpdateTracker:
         categories = data.setdefault("categories", [])
         releases = data.setdefault("releases", [])
 
-        release, release_created = self._resolve_target_release(releases, data.get("knownIssues", []))
+        release, release_created = self._resolve_target_release(
+            releases, data.get("knownIssues", []), get_scheme(data.get("settings"))
+        )
         cache_entities = dict(self._cache.get("entities", {}))
         notification_lines: list[str] = []
 
@@ -384,10 +384,16 @@ class UpdateTracker:
         )
 
     def _resolve_target_release(
-        self, releases: list[dict[str, Any]], known_issues: list[dict[str, Any]]
+        self, releases: list[dict[str, Any]], known_issues: list[dict[str, Any]], scheme: str
     ) -> tuple[dict[str, Any], bool]:
-        """Ziel-Release liefern; zweiter Rueckgabewert: wurde es neu angelegt?"""
-        today = datetime.now().strftime("%Y-%m-%d")
+        """Ziel-Release liefern; zweiter Rueckgabewert: wurde es neu angelegt?
+
+        Existiert fuer heute schon ein Release, bekommt es die Eintraege und es
+        wird keine neue Version vergeben. Sonst richtet sich die Nummer nach dem
+        gewaehlten Versionsschema (siehe versioning.py).
+        """
+        now = datetime.now()
+        today = now.strftime("%Y-%m-%d")
 
         for release in releases:
             if release.get("date") == today:
@@ -396,17 +402,7 @@ class UpdateTracker:
                 release.setdefault("knownIssues", [])
                 return release, False
 
-        year = datetime.now().year
-        month = datetime.now().month
-
-        best_counter = 0
-        for release in releases:
-            match = VERSION_PATTERN.match(release.get("version", ""))
-            if not match:
-                continue
-            r_year, r_month, r_counter = int(match.group(1)), int(match.group(2)), int(match.group(3))
-            if r_year == year and r_month == month:
-                best_counter = max(best_counter, r_counter)
+        version = next_version(scheme, (release.get("version", "") for release in releases), now.date())
 
         # Wie bei manueller Release-Erstellung (createNewRelease() im Admin-
         # Dashboard): offene bekannte Fehler werden als Vorschlag uebernommen.
@@ -418,7 +414,7 @@ class UpdateTracker:
 
         new_release = {
             "id": int(time.time() * 1000),
-            "version": f"{year}.{month}.{best_counter + 1}",
+            "version": version,
             "name": "",
             "date": today,
             "features": [],

@@ -1,8 +1,15 @@
-# 📝 Home Assistant Release Notes Manager
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/atheile-ha/ha-release-notes-manager/main/custom_components/release_notes_manager/brand/dark_logo@2x.png">
+    <img src="https://raw.githubusercontent.com/atheile-ha/ha-release-notes-manager/main/custom_components/release_notes_manager/brand/logo@2x.png" alt="Release Notes Manager" width="420">
+  </picture>
+</p>
+
+# Home Assistant Release Notes Manager
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 
-Ein elegantes Tool zur Verwaltung und Anzeige von Release Notes direkt in Home Assistant.
+Ein elegantes Tool zur Verwaltung und Anzeige von Release Notes direkt in Home Assistant. Inoffizielle Integration, nicht mit dem Home-Assistant-Projekt verbunden.
 
 ## ✨ Features
 
@@ -11,33 +18,28 @@ Ein elegantes Tool zur Verwaltung und Anzeige von Release Notes direkt in Home A
 - 🎨 **Admin-Interface (Eingabe-Dashboard)** - Vollständiges Verwaltungs-Interface zum Erstellen und Bearbeiten von Releases
 - 🖥️ **Dashboard-Karte** (`custom:release-notes-card`) - Kompakte Anzeige der neuesten Releases, aktualisiert sich sofort nach jedem Speichern
 - 🌓 **Light/Dark Mode** - Folgt dem aktiven Home-Assistant-Theme, im Admin-Interface manuell umschaltbar
+- 📊 **Statistik** - Zeitverlauf von Releases, Features, Änderungen und Bugs im Admin-Interface, filterbar nach Kategorie
 - 🔍 **Suche & Filter** - Schnell das richtige Release finden
 - 🔄 **Immer aktuell** - Karte und Seiten werden nach einem Update ohne manuelles Cache-Leeren neu geladen
 - 🔧 **Einstellungen** - Popup im Admin-Interface, u.a. mit Export/Import des Datenstands als JSON
 - 🖱️ **Drag'n'Drop** - Einträge im Admin-Interface zwischen "Neue Features" und "Änderungen/Bugfixes" verschieben und innerhalb eines Bereichs umsortieren
 - 🔄 **Automatische Update-Dokumentation** - Beobachtet alle `update.*`-Entitäten der Instanz und legt bei abgeschlossenen Updates sowie neu hinzugekommenen/entfernten Integrationen automatisch passende Release-Notes-Einträge an (ein-/ausschaltbar in den Einstellungen)
 
-## 🆕 Version 0.7.0
-
-### ⚠️ Breaking Change
-
-Die Widget-Seite `release-notes-widget.html` wurde entfernt. Bestehende iframe-Cards zeigen nach dem Update einen 404-Fehler und müssen durch `type: custom:release-notes-card` ersetzt werden (siehe [Konfiguration](#️-konfiguration)).
+## 🆕 Version 0.8.0
 
 ### Neu in dieser Version:
 
-✅ **Dashboard-Karte statt iframe-Card**
-- Das Widget ist jetzt eine eigene Lovelace-Karte (`custom:release-notes-card`) wie in ha_ev-charge-record und erscheint in der Kartenauswahl - keine iframe-Card mehr nötig
-- Sie aktualisiert sich sofort, sobald im Admin-Interface gespeichert oder ein Update automatisch dokumentiert wird
-- Die Daten kommen über die angemeldete Websocket-Verbindung von Home Assistant
-- Optionen `title`, `count` und `auto_collapse` (siehe [Konfiguration](#️-konfiguration))
+✅ **Statistik-Popup im Admin-Interface**
+- Button „Statistik“ zeigt den Zeitverlauf von Releases, Features, Änderungen, neuen Bugs und offenen Bugs
+- Zeitraum und Auflösung (Tag bis Jahr) wählbar, Balken oder Linien, Filter nach Kategorien
 
-✅ **Neues Design mit Light- und Dark-Mode**
-- Admin-Interface und Karte folgen dem aktiven Home-Assistant-Theme; im Admin-Interface unter **Einstellungen → Darstellung** auch manuell auf Hell oder Dunkel umschaltbar
-- Kartenaufbau angelehnt an [ha_ev-charge-record](https://github.com/atheile-ha/ha_ev-charge-record): Chips für die Zusammenfassung, aufklappbare Details, Chip „Aktuell“ für das neueste Release
-- Kategorie-Farben sind für beide Themes abgestimmt (Kontrast mindestens 4,5:1); gespeicherte Farben werden beim ersten Öffnen des Admin-Interfaces automatisch umgestellt
+✅ **Eigenes Logo**
+- Neues Logo in Admin-Interface, Dashboard-Karte, README sowie in der Integrationsliste von Home Assistant und HACS (ab Home Assistant 2026.3)
 
-✅ **Kein manueller Cache-Parameter mehr**
-- Der `?=vX.X.X`-Parameter in den Dashboard-URLs entfällt: Karte und Seiten werden nach einem Update automatisch neu geladen
+✅ **Versionsschema einstellbar**
+- Unter **Einstellungen → Versionsschema**: `YYYY.MM.ZZ` (Jahr.Monat.Zähler) oder `xx.yy.zz` (Major.Minor.Bugfix)
+- Das gewählte Schema gilt auch für die automatische Update-Dokumentation: Bei `YYYY.MM.ZZ` zählt der Zähler im Monat weiter, bei `xx.yy.zz` wird Minor erhöht und Bugfix auf 0 gesetzt
+- Bei `YYYY.MM.ZZ` lässt sich per Schalter festlegen, ob neue Releases die nächste Nummer vorausgefüllt bekommen (Standard: aus)
 
 Vollständige Versionshistorie: [CHANGELOG.md](CHANGELOG.md)
 
@@ -137,7 +139,7 @@ Offene bekannte Fehler werden beim Anlegen eines neuen Release automatisch als V
 
 Läuft standardmäßig aktiviert im Hintergrund und benötigt keine Konfiguration:
 
-- Schließt eine `update.*`-Entität in Home Assistant ein Update ab, wird automatisch ein Eintrag `"[alte Version] → [neue Version]"` in der Kategorie **"Update"** im passenden Tages-Release angelegt (neues Release wird bei Bedarf automatisch erstellt, Versionsschema `YYYY.M.N`)
+- Schließt eine `update.*`-Entität in Home Assistant ein Update ab, wird automatisch ein Eintrag `"[alte Version] → [neue Version]"` in der Kategorie **"Update"** im passenden Tages-Release angelegt (neues Release wird bei Bedarf automatisch erstellt, Versionsschema einstellbar, siehe Einstellungen)
 - Neu hinzugekommene bzw. entfernte `update.*`-Entitäten werden als **"Neuinstallation"**/**"Deinstallation"** in der Kategorie **"Integration / Addon"** dokumentiert
 - Mehrere gleichzeitige Ereignisse werden zu einer gemeinsamen Benachrichtigung gebündelt (Home Assistant → Mitteilungen)
 - Beim ersten Aktivieren wird nur eine stille Bestandsaufnahme durchgeführt, es entstehen keine rückwirkenden Einträge für bereits installierte Komponenten
@@ -212,5 +214,5 @@ MIT License - siehe [LICENSE](LICENSE)
 
 Entwickelt für die Home Assistant Community 🏠
 
-**Version:** 0.7.0  
+**Version:** 0.8.0  
 **Repository:** https://github.com/atheile-ha/ha-release-notes-manager

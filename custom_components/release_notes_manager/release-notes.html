@@ -4,15 +4,19 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <meta id="version-meta" name="version" content="0.7.0">
+  <meta id="version-meta" name="version" content="0.8.0">
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home Assistant Release Notes Manager - Admin v0.7.0</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2064%2064%22%3E%3Crect%20width=%2264%22%20height=%2264%22%20rx=%2214%22%20fill=%22%234338ca%22/%3E%3Crect%20x=%2216%22%20y=%2211%22%20width=%2228%22%20height=%2238%22%20rx=%224%22%20fill=%22%23ffffff%22/%3E%3Cpath%20d=%22M36%2011H44V19Z%22%20fill=%22%234338ca%22/%3E%3Cpath%20d=%22M36%2011V19H44Z%22%20fill=%22%23c7d2fe%22/%3E%3Crect%20x=%2221%22%20y=%2225%22%20width=%2218%22%20height=%223%22%20rx=%221.5%22%20fill=%22%236462a0%22/%3E%3Crect%20x=%2221%22%20y=%2231%22%20width=%2214%22%20height=%223%22%20rx=%221.5%22%20fill=%22%236462a0%22/%3E%3Crect%20x=%2221%22%20y=%2237%22%20width=%2210%22%20height=%223%22%20rx=%221.5%22%20fill=%22%236462a0%22/%3E%3Crect%20x=%2232%22%20y=%2240%22%20width=%2225%22%20height=%2215%22%20rx=%227.5%22%20fill=%22%23fbbf24%22/%3E%3Crect%20x=%2238%22%20y=%2245%22%20width=%2213%22%20height=%225%22%20rx=%222.5%22%20fill=%22%23312e81%22/%3E%3C/svg%3E">
+  <title>Home Assistant Release Notes Manager - Admin v0.8.0</title>
   <style>
     /* Farben: Standardwerte des HA-Themes (hell/dunkel). Im HA-iframe überschreibt
        applyTheme() sie mit den Werten des aktiven HA-Themes. */
     :root {
+      /* Statistik-Diagramme (Referenzpalette, Reihenfolge Blau/Orange/Aqua, Releases in Violett) */
+      --st-feat: #2a78d6; --st-chg: #eb6834; --st-bug: #1baf7a; --st-rel: #6250d6;
+      --st-grid: #e1e0d9; --st-axis: #c3c2b7; --st-wash: rgba(33, 33, 33, 0.06);
       --primary-background-color: #fafafa;
       --card-background-color: #ffffff;
       --primary-text-color: #212121;
@@ -48,6 +52,8 @@
     }
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme="light"]) {
+        --st-feat: #3987e5; --st-chg: #d95926; --st-bug: #199e70; --st-rel: #9085e9;
+        --st-grid: #2c2c2a; --st-axis: #383835; --st-wash: rgba(225, 225, 225, 0.08);
         --primary-background-color: #111111;
         --card-background-color: #1c1c1c;
         --primary-text-color: #e1e1e1;
@@ -71,6 +77,8 @@
     }
     /* Gleiche Werte wie oben, damit der manuelle Schalter / das HA-Theme in beide Richtungen greift */
     :root[data-theme="dark"] {
+      --st-feat: #3987e5; --st-chg: #d95926; --st-bug: #199e70; --st-rel: #9085e9;
+      --st-grid: #2c2c2a; --st-axis: #383835; --st-wash: rgba(225, 225, 225, 0.08);
       --primary-background-color: #111111;
       --card-background-color: #1c1c1c;
       --primary-text-color: #e1e1e1;
@@ -162,7 +170,7 @@
     .toolbar { padding: 0.875rem 1rem; display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
     .toolbar-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
     .header-title { display: flex; align-items: center; gap: 12px; min-width: 0; }
-    .ha-logo { height: 32px; width: 32px; flex-shrink: 0; color: var(--primary-color); }
+    .ha-logo { height: 32px; width: 32px; flex-shrink: 0; }
     .app-title { font-size: 1.25rem; font-weight: 500; }
     .save-status { font-size: 0.8rem; color: var(--secondary-text-color); min-height: 1em; }
     .filters { display: flex; gap: 0.5rem; padding: 0 1rem 0.875rem; flex-wrap: wrap; }
@@ -280,7 +288,76 @@
     .item-card.drop-before { box-shadow: 0 -3px 0 0 var(--primary-color); }
     .item-card.drop-after { box-shadow: 0 3px 0 0 var(--primary-color); }
 
+    /* Versionsschema in den Einstellungen */
+    .vs-opts { display: grid; gap: 0.5rem; }
+    .vs-opt { text-align: left; display: flex; gap: 0.625rem; align-items: flex-start; padding: 0.625rem 0.75rem; border: 1px solid var(--rn-input-border); border-radius: 10px; background: transparent; color: var(--primary-text-color); }
+    .vs-opt[aria-checked="true"] { border-color: var(--primary-color); background: color-mix(in srgb, var(--primary-color) 8%, transparent); }
+    .vs-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--rn-input-border); margin-top: 2px; flex-shrink: 0; display: grid; place-items: center; }
+    .vs-opt[aria-checked="true"] .vs-dot { border-color: var(--primary-color); }
+    .vs-opt[aria-checked="true"] .vs-dot::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--primary-color); }
+    .vs-opt code { font-family: ui-monospace, Consolas, monospace; font-size: 0.85em; background: var(--rn-head-bg); padding: 1px 5px; border-radius: 4px; }
+    .vs-switch-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+    .vs-switch-row[data-off="true"] { opacity: 0.5; }
+    .vs-switch { width: 42px; height: 24px; border-radius: 999px; border: 0; background: var(--rn-input-border); position: relative; flex-shrink: 0; transition: background-color 0.15s; }
+    .vs-switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform 0.15s; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
+    .vs-switch[aria-checked="true"] { background: var(--primary-color); }
+    .vs-switch[aria-checked="true"]::after { transform: translateX(18px); }
+    .vs-switch:disabled { cursor: not-allowed; }
+    .version-hint { margin-top: 0.375rem; padding: 0.375rem 0.625rem; border-radius: 8px; font-size: 0.8rem; background: color-mix(in srgb, var(--warning-color) 12%, var(--rn-card)); border: 1px solid color-mix(in srgb, var(--warning-color) 40%, transparent); }
+
+    /* Statistik-Popup */
+    .st-body { display: flex; flex-direction: column; gap: 0.875rem; min-width: 0; }
+    .st-ctl { display: flex; flex-wrap: wrap; gap: 0.625rem 1.125rem; align-items: center; }
+    .st-grp { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; min-width: 0; }
+    .st-grp .seg { max-width: 100%; overflow-x: auto; }
+    .st-grp .seg button { white-space: nowrap; }
+    .st-cap { font-size: 0.72rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--secondary-text-color); }
+    .st-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    .st-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 11px; border-radius: 999px; font-size: 0.8rem; font-weight: 500; border: 1px solid var(--rn-input-border); background: transparent; color: var(--secondary-text-color); }
+    .st-chip i { width: 8px; height: 8px; border-radius: 50%; background: var(--lbl-bg); border: 1px solid var(--rn-input-border); }
+    .st-chip[aria-pressed="true"] { background: var(--lbl-bg); color: var(--lbl-fg); border-color: var(--lbl-bd, transparent); }
+    .st-chip[aria-pressed="true"] i { background: var(--lbl-fg); border-color: transparent; }
+    .st-mini { padding: 2px 8px; font-size: 0.75rem; border: 0; background: transparent; color: var(--primary-color); border-radius: 6px; }
+    .st-mini:hover { background: color-mix(in srgb, var(--primary-color) 10%, transparent); }
+    .st-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); gap: 0.625rem; }
+    .st-tile { border: 1px solid var(--divider-color); border-radius: 10px; padding: 0.625rem 0.75rem; min-width: 0; }
+    .st-tile-l { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--secondary-text-color); }
+    .st-tile-l i { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+    .st-tile-v { font-size: 1.6rem; font-weight: 600; line-height: 1.2; margin-top: 2px; }
+    .st-tile-s { font-size: 0.72rem; color: var(--secondary-text-color); }
+    .st-plots { position: relative; display: flex; flex-direction: column; gap: 6px; touch-action: pan-y; }
+    .st-plots:focus-visible { outline-offset: 4px; border-radius: 6px; }
+    .st-plots svg { display: block; width: 100%; overflow: visible; }
+    .st-panel-h { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; justify-content: space-between; margin-top: 8px; }
+    .st-panel-h:first-child { margin-top: 0; }
+    .st-panel-t { font-size: 0.875rem; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+    .st-panel-t i { width: 10px; height: 10px; border-radius: 3px; }
+    .st-legend { display: flex; flex-wrap: wrap; gap: 4px; }
+    .st-legend button { display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border: 0; background: transparent; border-radius: 6px; font-size: 0.8rem; color: var(--primary-text-color); }
+    .st-legend button:hover { background: var(--rn-head-bg); }
+    .st-legend button i { width: 10px; height: 10px; border-radius: 3px; }
+    .st-legend button[aria-pressed="false"] { color: var(--secondary-text-color); text-decoration: line-through; }
+    .st-legend button[aria-pressed="false"] i { opacity: 0.3; }
+    .st-tick { fill: var(--secondary-text-color); font-size: 11px; font-family: inherit; }
+    .st-endlbl { fill: var(--primary-text-color); font-size: 12px; font-weight: 600; font-family: inherit; }
+    .st-tip { position: absolute; z-index: 5; top: 0; pointer-events: none; background: var(--rn-card); color: var(--primary-text-color); border: 1px solid var(--rn-input-border); border-radius: 8px; padding: 8px 10px; font-size: 0.8rem; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18); min-width: 11rem; }
+    .st-tip-h { font-weight: 600; margin-bottom: 4px; }
+    .st-tip-r { display: flex; align-items: center; gap: 6px; justify-content: space-between; }
+    .st-tip-r span { display: inline-flex; align-items: center; gap: 6px; }
+    .st-tip-r i { width: 9px; height: 9px; border-radius: 3px; }
+    .st-tip-r b { font-variant-numeric: tabular-nums; font-weight: 600; }
+    .st-empty { text-align: center; padding: 2.25rem 0.75rem; color: var(--secondary-text-color); }
+    .st-empty b { display: block; color: var(--primary-text-color); font-size: 1.05rem; font-weight: 500; margin-bottom: 4px; }
+    .st-details summary { cursor: pointer; font-size: 0.875rem; color: var(--primary-color); width: fit-content; }
+    .st-details summary:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+    .st-tbl-wrap { overflow: auto; max-height: 15rem; margin-top: 8px; border: 1px solid var(--divider-color); border-radius: 8px; }
+    .st-tbl-wrap table { border-collapse: collapse; width: 100%; font-size: 0.8rem; }
+    .st-tbl-wrap th, .st-tbl-wrap td { padding: 5px 10px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--divider-color); font-variant-numeric: tabular-nums; }
+    .st-tbl-wrap th:first-child, .st-tbl-wrap td:first-child { text-align: left; }
+    .st-tbl-wrap th { position: sticky; top: 0; background: var(--rn-card); font-weight: 500; color: var(--secondary-text-color); }
+
     @media (max-width: 600px) {
+      .st-tile-v { font-size: 1.4rem; }
       .app { padding: 1rem; }
       .grid-cols-2 { grid-template-columns: 1fr; }
       .lbl { width: 6.5rem; }
@@ -293,7 +370,7 @@
     <div class="card">
       <div class="toolbar">
         <div class="header-title">
-          <svg class="ha-logo" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21.8,13H20V21H13V17.67L15.79,14.88L16.5,15C17.66,15 18.6,14.06 18.6,12.9C18.6,11.74 17.66,10.8 16.5,10.8A2.1,2.1 0 0,0 14.4,12.9L14.5,13.61L13,15.13V9.65C13.66,9.29 14.1,8.6 14.1,7.8A2.1,2.1 0 0,0 12,5.7A2.1,2.1 0 0,0 9.9,7.8C9.9,8.6 10.34,9.29 11,9.65V15.13L9.5,13.61L9.6,12.9A2.1,2.1 0 0,0 7.5,10.8A2.1,2.1 0 0,0 5.4,12.9A2.1,2.1 0 0,0 7.5,15L8.21,14.88L11,17.67V21H4V13H2.25C1.83,13 1.42,13 1.42,12.79C1.43,12.57 1.85,12.15 2.28,11.72L11,3C11.33,2.67 11.67,2.33 12,2.33C12.33,2.33 12.67,2.67 13,3L17,7V6H19V9L21.78,11.78C22.18,12.18 22.59,12.59 22.6,12.8C22.6,13 22.2,13 21.8,13M7.5,12A0.9,0.9 0 0,1 8.4,12.9A0.9,0.9 0 0,1 7.5,13.8A0.9,0.9 0 0,1 6.6,12.9A0.9,0.9 0 0,1 7.5,12M16.5,12C17,12 17.4,12.4 17.4,12.9C17.4,13.4 17,13.8 16.5,13.8A0.9,0.9 0 0,1 15.6,12.9A0.9,0.9 0 0,1 16.5,12M12,6.9C12.5,6.9 12.9,7.3 12.9,7.8C12.9,8.3 12.5,8.7 12,8.7C11.5,8.7 11.1,8.3 11.1,7.8C11.1,7.3 11.5,6.9 12,6.9Z"/></svg>
+          <svg class="ha-logo" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#4338ca"/><rect x="16" y="11" width="28" height="38" rx="4" fill="#ffffff"/><path d="M36 11H44V19Z" fill="#4338ca"/><path d="M36 11V19H44Z" fill="#c7d2fe"/><rect x="21" y="25" width="18" height="3" rx="1.5" fill="#6462a0"/><rect x="21" y="31" width="14" height="3" rx="1.5" fill="#6462a0"/><rect x="21" y="37" width="10" height="3" rx="1.5" fill="#6462a0"/><rect x="32" y="40" width="25" height="15" rx="7.5" fill="#fbbf24"/><rect x="38" y="45" width="13" height="5" rx="2.5" fill="#312e81"/></svg>
           <div>
             <h1 class="app-title">Home Assistant Release Notes Manager</h1>
             <p class="save-status" id="save-status"></p>
@@ -302,6 +379,7 @@
         <div class="toolbar-actions">
           <button class="btn" onclick="showCategoriesManager()">Kategorien</button>
           <input type="file" id="import-file-input" accept="application/json" style="display:none" onchange="handleImportFile(event)"/>
+          <button class="btn" onclick="showStats()">Statistik</button>
           <button class="btn" onclick="showSettings()">Einstellungen</button>
           <button class="btn btn-primary" onclick="createNewRelease()">+ Neues Release</button>
         </div>
@@ -426,7 +504,7 @@ async function saveData(){console.log('💾 Speichere...');setSaveStatus('Speich
 function exportData(){const d={releases:state.releases,knownIssues:state.knownIssues,categories:state.categories,settings:state.settings,lastUpdate:new Date().toISOString()};const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');const stamp=new Date().toISOString().slice(0,10);a.href=url;a.download=`release-notes-export-${stamp}.json`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url)}
 function handleImportFile(event){const file=event.target.files&&event.target.files[0];event.target.value='';if(!file)return;const reader=new FileReader();reader.onload=async()=>{let d;try{d=JSON.parse(reader.result)}catch(e){alert(`Import fehlgeschlagen: Datei enthält kein gültiges JSON.\n\n${e.message}`);return}if(!d||!Array.isArray(d.releases)){alert('Import fehlgeschlagen: Datei enthält keine gültigen Release-Notes-Daten (Feld "releases" fehlt).');return}if(!confirm(`Import wird die aktuellen Daten vollständig ersetzen (${d.releases.length} Releases in der Datei).\n\nFortfahren?`))return;state.releases=d.releases;state.knownIssues=Array.isArray(d.knownIssues)?d.knownIssues:[];state.categories=Array.isArray(d.categories)&&d.categories.length>0?d.categories:state.categories;state.settings=d.settings&&typeof d.settings==='object'?d.settings:state.settings;normalizeCategoryColors();if(await saveData()){render()}};reader.onerror=()=>alert('Import fehlgeschlagen: Datei konnte nicht gelesen werden.');reader.readAsText(file)}
 function setSaveStatus(t){document.getElementById('save-status').textContent=t}
-function createNewRelease(){const today=new Date().toISOString().split('T')[0];const open=state.knownIssues.filter(i=>i.status!=='resolved');const inherited=open.map(i=>({...JSON.parse(JSON.stringify(i)),inheritedFrom:true}));console.log(`📋 Übernehme ${inherited.length} offene Fehler`);state.editingRelease={id:Date.now(),version:'',name:'',date:today,features:[],changes:[],knownIssues:inherited,comments:''};showModal('release')}
+function createNewRelease(){const today=new Date().toISOString().split('T')[0];const open=state.knownIssues.filter(i=>i.status!=='resolved');const inherited=open.map(i=>({...JSON.parse(JSON.stringify(i)),inheritedFrom:true}));console.log(`📋 Übernehme ${inherited.length} offene Fehler`);state.editingRelease={id:Date.now(),version:versionPrefillOn()?nextCalverVersion():'',name:'',date:today,features:[],changes:[],knownIssues:inherited,comments:''};showModal('release')}
 function rebuildKnownIssues(){const byId=new Map();const sorted=[...state.releases].sort((a,b)=>new Date(b.date)-new Date(a.date)||b.id-a.id);sorted.forEach(r=>{(r.knownIssues||[]).forEach(i=>{if(!byId.has(i.id))byId.set(i.id,i)})});state.knownIssues=Array.from(byId.values())}
 async function saveRelease(){if(!state.editingRelease||!state.editingRelease.version){alert('Bitte Version eingeben!');return}state.editingRelease.knownIssues=state.editingRelease.knownIssues.map(i=>{const c={...i};delete c.inheritedFrom;return c});const isNew=!state.releases.find(r=>r.id===state.editingRelease.id);state.releases=isNew?[state.editingRelease,...state.releases]:state.releases.map(r=>r.id===state.editingRelease.id?state.editingRelease:r);rebuildKnownIssues();if(await saveData()){hideModal();state.editingRelease=null;render()}}
 function editRelease(id){state.editingRelease=JSON.parse(JSON.stringify(state.releases.find(r=>r.id===id)));showModal('release')}
@@ -491,8 +569,453 @@ function selectColor(catId, colorId) {
   renderModal();
   render();
 }
+// ===== Versionsschema =====
+// Gegenstück zu versioning.py im Backend (gleiche Muster). Reine Funktionen; frontend/test/version-core.test.ts prüft diesen Block.
+// <version-core>
+const VersionCore = (function () {
+  const CALVER = /^(\d{4})\.(\d{1,2})\.(\d+)$/;
+  const SEMVER = /^(\d{1,3})\.(\d+)\.(\d+)$/;
+  const schemeOf = settings => (settings && settings.versionScheme === 'semver') ? 'semver' : 'calver';
+  const matches = (scheme, version) => (scheme === 'semver' ? SEMVER : CALVER).test((version || '').trim());
+  // Höchster Zähler im Monat plus 1, im neuen Monat 1 (Monat ohne führende Null)
+  function nextCalver(versions, year, month) {
+    let best = 0;
+    versions.forEach(v => {
+      const m = CALVER.exec(v || '');
+      if (m && +m[1] === year && +m[2] === month) best = Math.max(best, +m[3]);
+    });
+    return year + '.' + month + '.' + (best + 1);
+  }
+  return { schemeOf, matches, nextCalver };
+})();
+// </version-core>
+function versionPrefillOn() { return VersionCore.schemeOf(state.settings) === 'calver' && !!state.settings.versionPrefill; }
+function nextCalverVersion() {
+  const d = new Date();
+  return VersionCore.nextCalver(state.releases.map(r => r.version), d.getFullYear(), d.getMonth() + 1);
+}
+function versionPlaceholder() { return 'z.B. ' + (VersionCore.schemeOf(state.settings) === 'semver' ? '1.5.0' : nextCalverVersion()); }
+// Nur ein Hinweis, Speichern bleibt möglich
+function versionHintText(v) {
+  const scheme = VersionCore.schemeOf(state.settings);
+  if (!v || !v.trim() || VersionCore.matches(scheme, v)) return '';
+  return 'Passt nicht zum eingestellten Muster ' + (scheme === 'semver' ? 'xx.yy.zz (Major.Minor.Bugfix)' : 'YYYY.MM.ZZ') + '. Speichern ist trotzdem möglich.';
+}
+function updateVersionHint() {
+  const el = document.getElementById('version-hint');
+  if (!el || !state.editingRelease) return;
+  const t = versionHintText(state.editingRelease.version);
+  el.textContent = t;
+  el.hidden = !t;
+}
+async function setVersionScheme(v) { state.settings.versionScheme = v === 'semver' ? 'semver' : 'calver'; await saveData(); renderModal(); }
+async function toggleVersionPrefill(on) { state.settings.versionPrefill = !!on; await saveData(); renderModal(); }
+function renderVersionSettings() {
+  const scheme = VersionCore.schemeOf(state.settings), cal = scheme === 'calver', on = versionPrefillOn();
+  const opt = (id, title, code, text) => `<button type="button" class="vs-opt" role="radio" aria-checked="${scheme === id}" onclick="setVersionScheme('${id}')"><span class="vs-dot"></span><span><strong>${title}</strong> <code>${code}</code><br><span class="text-xs text-gray-600">${text}</span></span></button>`;
+  return `<div class="panel mb-4"><h3 class="panel-title">Versionsschema</h3><p class="text-sm text-gray-600 mb-3">Gilt für neue Releases, auch für die automatische Update-Dokumentation. Bestehende Releases bleiben unverändert.</p><div class="vs-opts" role="radiogroup" aria-label="Versionsschema">${opt('calver', 'Jahr.Monat.Zähler', 'YYYY.MM.ZZ', 'Beispiel 2026.10.3. Der Zähler beginnt jeden Monat bei 1.')}${opt('semver', 'Major.Minor.Bugfix', 'xx.yy.zz', 'Beispiel 1.4.2. Automatisch angelegte Releases erhöhen Minor und setzen Bugfix auf 0.')}</div><div class="vs-switch-row mt-3"${cal ? '' : ' data-off="true"'}><div><div class="font-medium">Neue Releases mit nächster Nummer vorausfüllen</div><div class="text-xs text-gray-600">${cal ? 'Beim Klick auf „+ Neues Release“ steht als Version ' + (on ? nextCalverVersion() : 'nichts (wie bisher)') + '.' : 'Nur beim Schema YYYY.MM.ZZ verfügbar. Bei xx.yy.zz bleibt das Feld leer.'}</div></div><button type="button" class="vs-switch" role="switch" aria-checked="${cal && on}" aria-label="Neue Releases mit nächster Nummer vorausfüllen"${cal ? '' : ' disabled'} onclick="toggleVersionPrefill(${!on})"></button></div></div>`;
+}
+
+// ===== Statistik-Popup =====
+// Rechenkern ohne DOM-Zugriff; frontend/test/stats-core.test.ts liest diesen Block aus der Datei und prüft ihn.
+// <stats-core>
+const StatsCore = (function () {
+  const DAY = 864e5;
+  const GRANS = ['day', 'week', 'month', 'year'];
+  const toMs = s => { const p = s.split('-').map(Number); return Date.UTC(p[0], p[1] - 1, p[2]); };
+  const fromMs = ms => new Date(ms).toISOString().slice(0, 10);
+  function bucketStart(ms, g) {
+    const d = new Date(ms);
+    if (g === 'day') return ms;
+    if (g === 'week') return ms - ((d.getUTCDay() + 6) % 7) * DAY;
+    if (g === 'month') return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1);
+    return Date.UTC(d.getUTCFullYear(), 0, 1);
+  }
+  function nextBucket(ms, g) {
+    const d = new Date(ms);
+    if (g === 'day') return ms + DAY;
+    if (g === 'week') return ms + 7 * DAY;
+    if (g === 'month') return Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1);
+    return Date.UTC(d.getUTCFullYear() + 1, 0, 1);
+  }
+  function bucketCount(from, to, g) {
+    let n = 0;
+    for (let s = bucketStart(from, g); s <= to; s = nextBucket(s, g)) n++;
+    return n;
+  }
+  // Feinste Auflösung mit höchstens 40 Zeitabschnitten
+  function pickGran(from, to) {
+    return GRANS.find(g => bucketCount(from, to, g) <= 40) || 'year';
+  }
+  function isoWeek(ms) {
+    const d = new Date(ms), dn = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dn);
+    return Math.ceil(((d - Date.UTC(d.getUTCFullYear(), 0, 1)) / DAY + 1) / 7);
+  }
+  // Je Known-Issue-ID: Datum des frühesten Releases (neu) und des frühesten Releases mit Status "resolved" (gelöst)
+  function issueTimeline(releases) {
+    const sorted = releases.filter(r => r.date).sort((a, b) => toMs(a.date) - toMs(b.date) || a.id - b.id);
+    const map = new Map();
+    sorted.forEach(r => {
+      (r.knownIssues || []).forEach(i => {
+        let e = map.get(i.id);
+        if (!e) { e = { opened: r.date, releaseId: r.id, resolved: null, category: i.category || 'general' }; map.set(i.id, e); }
+        if (i.status === 'resolved' && !e.resolved) e.resolved = r.date;
+      });
+    });
+    return map;
+  }
+  // o: { from, to (ms), gran, match(categoryId) -> bool, allSelected }
+  function computeStats(releases, o) {
+    const g = o.gran, from = o.from, to = o.to, match = o.match;
+    const buckets = [], idx = new Map();
+    for (let s = bucketStart(from, g); s <= to; s = nextBucket(s, g)) {
+      idx.set(s, buckets.length);
+      buckets.push({ start: s, end: Math.min(nextBucket(s, g) - DAY, to), releases: 0, features: 0, changes: 0, bugs: 0, open: 0 });
+    }
+    const issues = issueTimeline(releases), bugRelease = new Set();
+    issues.forEach(e => {
+      if (!match(e.category)) return;
+      const ms = toMs(e.opened);
+      if (ms < from || ms > to) return;
+      buckets[idx.get(bucketStart(ms, g))].bugs++;
+      bugRelease.add(e.releaseId);
+    });
+    releases.forEach(r => {
+      if (!r.date) return;
+      const ms = toMs(r.date);
+      if (ms < from || ms > to) return;
+      const b = buckets[idx.get(bucketStart(ms, g))];
+      const f = (r.features || []).filter(i => match(i.category || 'general')).length;
+      const c = (r.changes || []).filter(i => match(i.category || 'general')).length;
+      b.features += f;
+      b.changes += c;
+      if (o.allSelected || f + c > 0 || bugRelease.has(r.id)) b.releases++;
+    });
+    buckets.forEach(b => {
+      issues.forEach(e => {
+        if (match(e.category) && toMs(e.opened) <= b.end && (!e.resolved || toMs(e.resolved) > b.end)) b.open++;
+      });
+    });
+    const totals = buckets.reduce((a, b) => {
+      a.releases += b.releases; a.features += b.features; a.changes += b.changes; a.bugs += b.bugs;
+      return a;
+    }, { releases: 0, features: 0, changes: 0, bugs: 0, open: 0 });
+    totals.open = buckets.length ? buckets[buckets.length - 1].open : 0;
+    return { buckets, totals, gran: g };
+  }
+  // Ganzzahlige Achsenteilung mit höchstens vier Intervallen
+  function niceTicks(max) {
+    if (max <= 0) max = 1;
+    let step = 1, mag = 1, found = false;
+    while (!found) {
+      for (const s of [1, 2, 5]) { step = s * mag; if (max / step <= 4) { found = true; break; } }
+      if (!found) mag *= 10;
+    }
+    const top = Math.ceil(max / step) * step, ticks = [];
+    for (let v = 0; v <= top; v += step) ticks.push(v);
+    return { top, ticks };
+  }
+  return { DAY, GRANS, toMs, fromMs, bucketStart, nextBucket, bucketCount, pickGran, isoWeek, issueTimeline, computeStats, niceTicks };
+})();
+// </stats-core>
+
+const STATS_MONTHS = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+const STATS_MONTHS_LONG = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+const STATS_RANGES = [['3m','3 Monate'], ['6m','6 Monate'], ['12m','1 Jahr'], ['all','Alles']];
+const STATS_GRAN_LABEL = {auto: 'Auto', day: 'Tag', week: 'Woche', month: 'Monat', year: 'Jahr'};
+const STATS_SERIES = [
+  {key: 'features', label: 'Features', color: 'var(--st-feat)'},
+  {key: 'changes', label: 'Änderungen', color: 'var(--st-chg)'},
+  {key: 'bugs', label: 'Neue Bugs', color: 'var(--st-bug)'}
+];
+const STATS_ML = 34, STATS_MR = 12, STATS_MT = 10;
+const statsUi = {range: 'all', gran: 'auto', mode: 'bars', hidden: new Set(), deselected: new Set(), hover: -1, view: null, P: null, ro: null, raf: 0, bounds: null};
+const stEl = id => document.getElementById(id);
+
+function statsToday() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function statsFmtDay(ms) { const d = new Date(ms); return String(d.getUTCDate()).padStart(2, '0') + '.' + String(d.getUTCMonth() + 1).padStart(2, '0') + '.'; }
+function statsBucketTitle(b, g) {
+  const d = new Date(b.start), y = d.getUTCFullYear();
+  if (g === 'day') return statsFmtDay(b.start) + y;
+  if (g === 'week') return 'KW ' + StatsCore.isoWeek(b.start) + ' · ' + statsFmtDay(b.start) + '–' + statsFmtDay(b.start + 6 * StatsCore.DAY) + y;
+  if (g === 'month') return STATS_MONTHS_LONG[d.getUTCMonth()] + ' ' + y;
+  return String(y);
+}
+function statsTickLabel(b, g) {
+  const d = new Date(b.start);
+  if (g === 'day' || g === 'week') return statsFmtDay(b.start);
+  if (g === 'month') return STATS_MONTHS[d.getUTCMonth()] + (d.getUTCMonth() === 0 ? ' ' + String(d.getUTCFullYear()).slice(2) : '');
+  return String(d.getUTCFullYear());
+}
+// Zeitraum endet heute (bzw. am spätesten Release, falls dieses in der Zukunft datiert ist)
+function statsBounds() {
+  const dated = state.releases.filter(r => r.date);
+  let to = StatsCore.toMs(statsToday());
+  dated.forEach(r => { to = Math.max(to, StatsCore.toMs(r.date)); });
+  let from;
+  if (statsUi.range === 'all') {
+    from = dated.length ? Math.min(...dated.map(r => StatsCore.toMs(r.date))) : to;
+  } else {
+    const d = new Date(to);
+    from = Date.UTC(d.getUTCFullYear(), d.getUTCMonth() - parseInt(statsUi.range, 10), d.getUTCDate() + 1);
+  }
+  return {from: Math.min(from, to), to};
+}
+function statsEffGran(rb) {
+  if (statsUi.gran !== 'auto' && StatsCore.bucketCount(rb.from, rb.to, statsUi.gran) <= 120) return statsUi.gran;
+  return StatsCore.pickGran(rb.from, rb.to);
+}
+function statsSeg(el, items, cur, isDisabled) {
+  el.innerHTML = items.map(it => `<button type="button" data-v="${it[0]}" aria-pressed="${cur === it[0]}"${isDisabled && isDisabled(it[0]) ? ' disabled title="Zu viele Zeitabschnitte für diesen Zeitraum"' : ''}>${it[1]}</button>`).join('');
+}
+function showStats() { showModal('stats'); }
+function renderStatsModal(c) {
+  c.innerHTML = `<div class="flex justify-between items-center mb-4"><div><h2 class="dialog-title">Statistik</h2><p class="text-xs text-gray-600" id="st-sub"></p></div><button class="btn" onclick="hideModal()">Schließen</button></div>
+<div class="st-body">
+  <div class="st-ctl">
+    <div class="st-grp"><span class="st-cap">Zeitraum</span><div class="seg" id="st-range"></div></div>
+    <div class="st-grp"><span class="st-cap">Auflösung</span><div class="seg" id="st-gran"></div></div>
+    <div class="st-grp"><span class="st-cap">Darstellung</span><div class="seg" id="st-mode"></div></div>
+  </div>
+  <div class="st-chips" id="st-chips" role="group" aria-label="Kategorien"></div>
+  <div class="st-tiles" id="st-tiles"></div>
+  <div id="st-area">
+    <div class="st-plots" id="st-plots" tabindex="0" aria-label="Zeitverlauf. Mit den Pfeiltasten durch die Zeitabschnitte gehen.">
+      <div class="st-panel-h"><div class="st-panel-t"><i style="background:var(--st-rel)"></i>Releases</div></div>
+      <svg id="st-svg-rel" role="img" aria-label="Releases pro Zeitabschnitt"></svg>
+      <div class="st-panel-h"><div class="st-panel-t">Neue Einträge</div><div class="st-legend" id="st-legend"></div></div>
+      <svg id="st-svg-main" role="img" aria-label="Features, Änderungen und neue Bugs pro Zeitabschnitt"></svg>
+      <div class="st-panel-h"><div class="st-panel-t"><i style="background:var(--st-bug)"></i>Offene Bugs am Ende des Zeitabschnitts</div></div>
+      <svg id="st-svg-open" role="img" aria-label="Bestand offener Bugs"></svg>
+      <div class="st-tip" id="st-tip" hidden></div>
+    </div>
+    <details class="st-details" style="margin-top:0.75rem"><summary>Wertetabelle anzeigen</summary><div class="st-tbl-wrap" id="st-tbl"></div></details>
+  </div>
+  <div class="st-empty" id="st-empty" hidden></div>
+  <p class="text-xs text-gray-600">„Neue Bugs“ zählt Known Issues im Zeitabschnitt ihres ersten Auftretens. „Offene Bugs“ ist der Bestand am Ende des Zeitabschnitts.</p>
+</div>`;
+  statsBind();
+  statsDraw();
+}
+function statsBind() {
+  const on = (id, fn) => stEl(id).addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b || b.disabled) return;
+    const idx = Array.from(b.parentElement.querySelectorAll('button')).indexOf(b);
+    fn(b);
+    // Die Bedienelemente werden neu gezeichnet; der Fokus bleibt auf derselben Stelle
+    const again = stEl(id) && stEl(id).querySelectorAll('button')[idx];
+    if (again) again.focus();
+  });
+  on('st-range', b => { statsUi.range = b.dataset.v; statsUi.hover = -1; statsDraw(); });
+  on('st-gran', b => { statsUi.gran = b.dataset.v; statsUi.hover = -1; statsDraw(); });
+  on('st-mode', b => { statsUi.mode = b.dataset.v; statsDraw(); });
+  on('st-legend', b => { const k = b.dataset.key; statsUi.hidden.has(k) ? statsUi.hidden.delete(k) : statsUi.hidden.add(k); statsDraw(); });
+  on('st-chips', b => {
+    if (b.dataset.all) statsUi.deselected = new Set();
+    else if (b.dataset.none) statsUi.deselected = new Set(state.categories.map(c => c.id));
+    else { const id = b.dataset.id; statsUi.deselected.has(id) ? statsUi.deselected.delete(id) : statsUi.deselected.add(id); }
+    statsDraw();
+  });
+  const plots = stEl('st-plots');
+  const idxAt = x => {
+    const P = statsUi.P;
+    if (!P) return -1;
+    const i = Math.floor((x - stEl('st-svg-main').getBoundingClientRect().left - STATS_ML) / P.slot);
+    return i >= 0 && i < P.n ? i : -1;
+  };
+  const setHover = i => { statsUi.hover = i; statsOverlay(i); };
+  plots.addEventListener('pointermove', e => setHover(idxAt(e.clientX)));
+  plots.addEventListener('pointerdown', e => setHover(idxAt(e.clientX)));
+  plots.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') setHover(-1); });
+  plots.addEventListener('keydown', e => {
+    const P = statsUi.P;
+    if (!P) return;
+    let i = statsUi.hover;
+    if (e.key === 'ArrowRight') i = i < 0 ? 0 : Math.min(P.n - 1, i + 1);
+    else if (e.key === 'ArrowLeft') i = i < 0 ? P.n - 1 : Math.max(0, i - 1);
+    else if (e.key === 'Home') i = 0;
+    else if (e.key === 'End') i = P.n - 1;
+    else if (e.key === 'Escape') i = -1;
+    else return;
+    e.preventDefault();
+    setHover(i);
+  });
+  if (window.ResizeObserver) {
+    statsUi.ro = new ResizeObserver(() => {
+      cancelAnimationFrame(statsUi.raf);
+      statsUi.raf = requestAnimationFrame(() => { if (stEl('st-plots') && stEl('modal').dataset.type === 'stats') statsDraw(); });
+    });
+    statsUi.ro.observe(plots);
+  }
+}
+function statsClose() {
+  if (statsUi.ro) { statsUi.ro.disconnect(); statsUi.ro = null; }
+  cancelAnimationFrame(statsUi.raf);
+  statsUi.hover = -1; statsUi.view = null; statsUi.P = null;
+}
+function statsRenderControls(rb) {
+  const hasData = state.releases.length > 0;
+  statsSeg(stEl('st-range'), STATS_RANGES, statsUi.range);
+  const shown = statsUi.gran === 'auto' || StatsCore.bucketCount(rb.from, rb.to, statsUi.gran) > 120 ? 'auto' : statsUi.gran;
+  statsSeg(stEl('st-gran'), Object.keys(STATS_GRAN_LABEL).map(k => [k, k === 'auto' && hasData ? 'Auto (' + STATS_GRAN_LABEL[statsEffGran(rb)] + ')' : STATS_GRAN_LABEL[k]]), shown,
+    k => k !== 'auto' && StatsCore.bucketCount(rb.from, rb.to, k) > 120);
+  statsSeg(stEl('st-mode'), [['bars', 'Balken'], ['lines', 'Linien']], statsUi.mode);
+  stEl('st-chips').innerHTML = '<span class="st-cap">Kategorien</span>' + [...state.categories].sort((a, b) => a.label.localeCompare(b.label, 'de')).map(c =>
+    `<button type="button" class="st-chip ${lblClass(c.color)}" data-id="${escInput(c.id)}" aria-pressed="${!statsUi.deselected.has(c.id)}"><i></i>${esc(c.label)}</button>`).join('') +
+    '<button type="button" class="st-mini" data-all="1">Alle</button><button type="button" class="st-mini" data-none="1">Keine</button>';
+  stEl('st-legend').innerHTML = STATS_SERIES.map(s =>
+    `<button type="button" data-key="${s.key}" aria-pressed="${!statsUi.hidden.has(s.key)}"><i style="background:${s.color}"></i>${s.label}</button>`).join('');
+}
+function statsDraw() {
+  if (!stEl('st-plots')) return;
+  const rb = statsBounds(), area = stEl('st-area'), empty = stEl('st-empty'), tiles = stEl('st-tiles');
+  statsUi.bounds = rb;
+  statsRenderControls(rb);
+  const n = state.releases.length;
+  stEl('st-sub').textContent = n ? n + (n === 1 ? ' Release' : ' Releases') + ' · Stand ' + formatDateDE(statsToday()) : '';
+  if (!n) {
+    area.hidden = true; tiles.hidden = true; empty.hidden = false;
+    empty.innerHTML = '<b>Noch keine Releases</b>Sobald das erste Release gespeichert ist, erscheint hier der Zeitverlauf.';
+    statsUi.view = null; statsUi.P = null;
+    return;
+  }
+  tiles.hidden = false;
+  const known = new Set(state.categories.map(c => c.id));
+  const S = StatsCore.computeStats(state.releases, {
+    from: rb.from, to: rb.to, gran: statsEffGran(rb),
+    match: id => !statsUi.deselected.has(known.has(id) ? id : 'general'),
+    allSelected: statsUi.deselected.size === 0
+  });
+  statsUi.view = S;
+  const t = S.totals, stand = formatDateDE(statsToday()).slice(0, 6);
+  tiles.innerHTML = [
+    ['Releases', t.releases, 'var(--st-rel)', 'im Zeitraum'], ['Features', t.features, 'var(--st-feat)', 'im Zeitraum'],
+    ['Änderungen', t.changes, 'var(--st-chg)', 'im Zeitraum'], ['Neue Bugs', t.bugs, 'var(--st-bug)', 'im Zeitraum'],
+    ['Offene Bugs', t.open, 'var(--st-bug)', 'Stand ' + stand]
+  ].map(x => `<div class="st-tile"><div class="st-tile-l"><i style="background:${x[2]}"></i>${x[0]}</div><div class="st-tile-v">${x[1]}</div><div class="st-tile-s">${x[3]}</div></div>`).join('');
+  const total = t.releases + t.features + t.changes + t.bugs + S.buckets.reduce((a, b) => a + b.open, 0);
+  if (!total) {
+    area.hidden = true; empty.hidden = false;
+    empty.innerHTML = '<b>Keine Einträge für diese Auswahl</b>' + (statsUi.deselected.size >= known.size ? 'Es ist keine Kategorie ausgewählt.' : 'Im gewählten Zeitraum gibt es zu diesen Kategorien nichts. Wähle weitere Kategorien oder einen größeren Zeitraum.');
+    statsUi.P = null;
+    return;
+  }
+  area.hidden = false; empty.hidden = true;
+  statsCharts(S);
+  statsTable(S);
+  statsOverlay(Math.min(statsUi.hover, S.buckets.length - 1));
+}
+function statsRoundedTop(x, y, w, h, r) {
+  r = Math.max(0, Math.min(r, w / 2, h));
+  return `M${x},${y + h}L${x},${y + r}Q${x},${y} ${x + r},${y}L${x + w - r},${y}Q${x + w},${y} ${x + w},${y + r}L${x + w},${y + h}Z`;
+}
+function statsFrame(svg, W, H, mb, max) {
+  const nt = StatsCore.niceTicks(max), ph = H - STATS_MT - mb, y = v => STATS_MT + ph * (1 - v / nt.top);
+  let html = '';
+  nt.ticks.forEach(v => {
+    html += `<line x1="${STATS_ML}" x2="${W - STATS_MR}" y1="${y(v)}" y2="${y(v)}" stroke="${v === 0 ? 'var(--st-axis)' : 'var(--st-grid)'}" stroke-width="1"/>` +
+      `<text class="st-tick" x="${STATS_ML - 6}" y="${y(v) + 4}" text-anchor="end">${v}</text>`;
+  });
+  svg.setAttribute('width', W); svg.setAttribute('height', H); svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+  return {html, y, ph, H};
+}
+function statsCharts(S) {
+  const W = Math.max(280, stEl('st-plots').clientWidth), n = S.buckets.length, slot = (W - STATS_ML - STATS_MR) / n, g = S.gran;
+  const bw = Math.max(2, Math.min(24, slot * 0.72)), gap = Math.min(2, bw * 0.25);
+  const vis = STATS_SERIES.filter(s => !statsUi.hidden.has(s.key));
+  const P = statsUi.P = {W, n, slot, vis};
+  const cx = i => STATS_ML + slot * (i + 0.5);
+
+  // Releases
+  const f1 = statsFrame(stEl('st-svg-rel'), W, 84, 6, Math.max(1, ...S.buckets.map(b => b.releases)));
+  let h1 = f1.html;
+  S.buckets.forEach((b, i) => {
+    if (!b.releases) return;
+    const y = f1.y(b.releases);
+    h1 += `<path d="${statsRoundedTop(cx(i) - bw / 2, y, bw, f1.y(0) - y, 4)}" fill="var(--st-rel)"/>`;
+  });
+  stEl('st-svg-rel').innerHTML = h1 + '<g class="ov"></g>';
+  P.rel = f1;
+
+  // Features / Änderungen / Neue Bugs
+  let cap = 1;
+  S.buckets.forEach(b => {
+    if (statsUi.mode === 'bars') cap = Math.max(cap, vis.reduce((a, s) => a + b[s.key], 0));
+    else vis.forEach(s => { cap = Math.max(cap, b[s.key]); });
+  });
+  const f2 = statsFrame(stEl('st-svg-main'), W, 230, 6, cap);
+  let h2 = f2.html;
+  if (statsUi.mode === 'bars') {
+    S.buckets.forEach((b, i) => {
+      let cum = 0;
+      const x = cx(i) - bw / 2, segs = [];
+      vis.forEach(s => { if (b[s.key] > 0) { segs.push({s, v: b[s.key], c0: cum}); cum += b[s.key]; } });
+      segs.forEach((sg, k) => {
+        const y0 = f2.y(sg.c0 + sg.v), y1 = f2.y(sg.c0) - (k ? gap : 0), h = Math.max(1.5, y1 - y0);
+        h2 += k === segs.length - 1
+          ? `<path d="${statsRoundedTop(x, y0, bw, h, 4)}" fill="${sg.s.color}"/>`
+          : `<rect x="${x}" y="${y0}" width="${bw}" height="${h}" fill="${sg.s.color}"/>`;
+      });
+    });
+  } else {
+    vis.forEach(s => {
+      const pts = S.buckets.map((b, i) => cx(i).toFixed(1) + ',' + f2.y(b[s.key]).toFixed(1));
+      h2 += `<polyline points="${pts.join(' ')}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>` +
+        `<circle cx="${cx(n - 1)}" cy="${f2.y(S.buckets[n - 1][s.key])}" r="4" fill="${s.color}" stroke="var(--rn-card)" stroke-width="2"/>`;
+    });
+  }
+  if (!vis.length) h2 += `<text class="st-tick" x="${W / 2}" y="${f2.H / 2}" text-anchor="middle">Alle Reihen sind in der Legende ausgeblendet</text>`;
+  stEl('st-svg-main').innerHTML = h2 + '<g class="ov"></g>';
+  P.main = f2;
+
+  // Offene Bugs
+  const f3 = statsFrame(stEl('st-svg-open'), W, 150, 26, Math.max(1, ...S.buckets.map(b => b.open)));
+  let h3 = f3.html;
+  const labelStep = Math.max(1, Math.ceil(56 / slot));
+  S.buckets.forEach((b, i) => {
+    if (i % labelStep || cx(i) > W - STATS_MR - 14) return;
+    h3 += `<text class="st-tick" x="${cx(i)}" y="${f3.H - 6}" text-anchor="middle">${statsTickLabel(b, g)}</text>`;
+  });
+  let pts = S.buckets.map((b, i) => [cx(i), f3.y(b.open)]);
+  if (n === 1) pts = [[cx(0) - 6, pts[0][1]], [cx(0) + 6, pts[0][1]]];
+  const line = pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' '), lp = pts[pts.length - 1];
+  h3 += `<polygon points="${pts[0][0]},${f3.y(0)} ${line} ${lp[0]},${f3.y(0)}" fill="var(--st-bug)" fill-opacity=".1"/>` +
+    `<polyline points="${line}" fill="none" stroke="var(--st-bug)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>` +
+    `<circle cx="${lp[0]}" cy="${lp[1]}" r="4" fill="var(--st-bug)" stroke="var(--rn-card)" stroke-width="2"/>` +
+    `<text class="st-endlbl" x="${lp[0] - 8}" y="${Math.max(STATS_MT + 12, lp[1] - 10)}" text-anchor="end">${S.buckets[n - 1].open} offen</text>`;
+  stEl('st-svg-open').innerHTML = h3 + '<g class="ov"></g>';
+  P.open = f3;
+}
+function statsOverlay(i) {
+  const S = statsUi.view, P = statsUi.P, tip = stEl('st-tip');
+  if (!tip) return;
+  ['rel', 'main', 'open'].forEach(k => { const ov = stEl('st-svg-' + k).querySelector('.ov'); if (ov) ov.innerHTML = ''; });
+  if (!S || !P || i < 0 || i >= S.buckets.length) { tip.hidden = true; return; }
+  const b = S.buckets[i], x = STATS_ML + P.slot * (i + 0.5);
+  ['rel', 'main', 'open'].forEach(k => {
+    const f = P[k], ov = stEl('st-svg-' + k).querySelector('.ov');
+    let html = `<rect x="${STATS_ML + P.slot * i}" y="${STATS_MT}" width="${P.slot}" height="${f.ph}" fill="var(--st-wash)"/>`;
+    if (k === 'main' && statsUi.mode === 'lines') P.vis.forEach(s => { html += `<circle cx="${x}" cy="${f.y(b[s.key])}" r="5" fill="${s.color}" stroke="var(--rn-card)" stroke-width="2"/>`; });
+    if (k === 'open') html += `<circle cx="${x}" cy="${f.y(b.open)}" r="5" fill="var(--st-bug)" stroke="var(--rn-card)" stroke-width="2"/>`;
+    ov.innerHTML = html;
+  });
+  const row = (c, l, v) => `<div class="st-tip-r"><span><i style="background:${c}"></i>${l}</span><b>${v}</b></div>`;
+  tip.innerHTML = `<div class="st-tip-h">${statsBucketTitle(b, S.gran)}</div>` + row('var(--st-rel)', 'Releases', b.releases) +
+    STATS_SERIES.map(s => row(s.color, s.label, b[s.key])).join('') + row('var(--st-bug)', 'Offene Bugs am Ende', b.open);
+  tip.hidden = false;
+  const tw = tip.offsetWidth;
+  tip.style.left = Math.max(0, x + 14 + tw > P.W ? x - 14 - tw : x + 14) + 'px';
+  tip.style.top = '8px';
+}
+function statsTable(S) {
+  stEl('st-tbl').innerHTML = '<table><thead><tr><th>Zeitabschnitt</th><th>Releases</th><th>Features</th><th>Änderungen</th><th>Neue Bugs</th><th>Offen am Ende</th></tr></thead><tbody>' +
+    S.buckets.map(b => `<tr><td>${statsBucketTitle(b, S.gran)}</td><td>${b.releases}</td><td>${b.features}</td><td>${b.changes}</td><td>${b.bugs}</td><td>${b.open}</td></tr>`).join('') + '</tbody></table>';
+}
+
 function showModal(t){document.getElementById('modal').classList.add('active');document.getElementById('modal').dataset.type=t;renderModal()}
-function hideModal(){document.getElementById('modal').classList.remove('active');state.editingRelease=null;state.resolvingIssueId=null;state.colorPickerCatId=null}
+function hideModal(){statsClose();document.getElementById('modal').classList.remove('active');state.editingRelease=null;state.resolvingIssueId=null;state.colorPickerCatId=null}
 function render(){renderCategoryFilter();renderReleases()}
 function renderCategoryFilter(){const s=document.getElementById('category-filter');s.innerHTML='<option value="all">Alle Kategorien</option>'+[...state.categories].sort((a,b)=>a.label.localeCompare(b.label,'de')).map(c=>`<option value="${c.id}" ${state.filterCategory===c.id?'selected':''}>${c.label}</option>`).join('')}
 function renderReleases(){const allFiltered=state.releases.filter(r=>{const ms=!state.searchTerm||JSON.stringify(r).toLowerCase().includes(state.searchTerm.toLowerCase());const mc=state.filterCategory==='all'||r.features.some(f=>f.category===state.filterCategory)||r.changes.some(c=>c.category===state.filterCategory);return ms&&mc});const f=state.searchTerm?allFiltered:allFiltered.slice(0,state.displayCount);const c=document.getElementById('releases-container');const hasMore=!state.searchTerm&&allFiltered.length>state.displayCount;const newestId=newestReleaseId();c.innerHTML=f.length===0?'<div class="card empty"><p class="empty-title">Keine Releases</p><p>Erstelle dein erstes Release!</p></div>':f.map(r=>renderRelease(r,r.id===newestId)).join('')+(hasMore?'<div class="more"><button class="btn" onclick="loadMore()">Weitere Releases laden ('+((allFiltered.length-state.displayCount))+' verbleibend)</button></div>':'')}
@@ -501,7 +1024,7 @@ function newestReleaseId(){const sorted=[...state.releases].sort((a,b)=>new Date
 
 function renderRelease(r,isNewest){ const exp=state.expandedReleases.has(r.id); const getCat=id=>state.categories.find(c=>c.id===id)||{label:id,color:'gray'}; const lbl=id=>{const cat=getCat(id||'general');return`<span class="lbl ${lblClass(cat.color)}">${esc(cat.label)}</span>`}; const open=(r.knownIssues||[]).filter(i=>i.status!=='resolved'); const resolved=(r.knownIssues||[]).filter(i=>i.status==='resolved'&&i.resolvedInVersion===r.version); const title=r.name?`Version ${esc(r.version)} - ${esc(r.name)}`:`Version ${esc(r.version)}`; const item=(type,i)=>{const isOpen=state.expandedDetails.has(r.id+'-'+type+'-'+i.id);const head=i.details?`<button type="button" class="item-toggle${isOpen?' open':''}" aria-expanded="${isOpen}" onclick="toggleDetails(${r.id},'${type}',${i.id})">${esc(i.title)}</button>`:`<div class="item-title">${esc(i.title)}</div>`;return`${lbl(i.category)}<div class="item-main">${head}${isOpen&&i.details?`<div class="item-details">${esc(i.details)}</div>`:''}</div>`}; const group=(heading,rows,cls='')=>`<div><h3 class="group-title">${heading}</h3><ul class="items${cls}">${rows}</ul></div>`; const body=(r.features&&r.features.length>0?group('Neue Features',r.features.map(f=>`<li class="item">${item('f',f)}</li>`).join('')):'')+(r.changes&&r.changes.length>0||resolved.length>0?group('Änderungen / Bugfixes',r.changes.map(c=>`<li class="item">${item('c',c)}</li>`).join('')+resolved.map(i=>`<li class="item">${lbl(i.category)}<div class="item-main"><div class="item-title">${esc(i.title)}</div><div class="chips"><span class="chip chip-done">Gelöst in ${esc(r.version)}</span></div>${i.resolution?`<div class="item-resolution">${esc(i.resolution)}</div>`:''}</div></li>`).join('')):'')+(open.length>0?group('Bekannte Fehler',open.map(i=>`<li class="item issue">${item('i',i)}</li>`).join(''),' issues'):'')+(r.comments?`<div class="note">${esc(r.comments)}</div>`:''); return`<div class="card release${exp?' open':''}"><div class="release-head" role="button" tabindex="0" aria-expanded="${exp}" onclick="toggleRelease(${r.id})" onkeydown="if(event.target===this&&(event.key==='Enter'||event.key===' ')){event.preventDefault();toggleRelease(${r.id})}"><div class="release-title-row"><h2 class="release-title">${title}</h2><div class="release-meta"><span class="release-date">${formatDateDE(r.date)}</span><button type="button" class="btn-icon" onclick="event.stopPropagation();editRelease(${r.id})" title="Release bearbeiten" aria-label="Release bearbeiten"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/></svg></button></div></div><div class="chips">${isNewest?'<span class="chip chip-now">Aktuell</span>':''}${getSummaryBadges(r)}</div></div>${exp?`<div class="release-body">${body}</div>`:''}</div>` }
 
-function renderModal(){const m=document.getElementById('modal');const c=m.querySelector('.modal-content');const t=m.dataset.type;if(t==='categories'){c.innerHTML=`<div class="flex justify-between items-center mb-6"><h2 class="dialog-title">Kategorien verwalten</h2><button class="btn" onclick="hideModal()">Schließen</button></div><div class="mb-6"><label class="block text-sm font-medium mb-2">Neue Kategorie</label><div class="flex gap-2"><input type="text" id="new-cat-input" placeholder="Name..." class="flex-1 px-3 py-2 rounded" onkeypress="if(event.key==='Enter')addCategory()"/><button class="btn btn-primary" onclick="addCategory()">+ Hinzufügen</button></div></div>${[...state.categories].sort((a,b)=>a.label.localeCompare(b.label,'de')).map(c=>state.editingCatId===c.id?`<div class="cat-row"><input type="text" value="${escInput(state.editingCatLabel)}" oninput="state.editingCatLabel=this.value" class="flex-1 px-2 py-1 rounded" onkeypress="if(event.key==='Enter')saveEditCat()"/><button class="btn btn-sm btn-primary" onclick="saveEditCat()">Speichern</button><button class="btn btn-sm" onclick="cancelEditCat()">Abbrechen</button></div>`:`<div class="cat-row"><span class="lbl ${lblClass(c.color)} lbl-pick" role="button" tabindex="0" aria-expanded="${state.colorPickerCatId===c.id}" onclick="toggleColorPicker('${c.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleColorPicker('${c.id}')}" title="Klicken um Farbe zu ändern">${esc(c.label)}</span><div class="flex gap-2"><button class="btn btn-sm" onclick="startEditCat('${c.id}','${esc(c.label)}')">Name ändern</button><button class="btn btn-sm btn-danger" onclick="deleteCategory('${c.id}')">Löschen</button></div></div>${state.colorPickerCatId===c.id?renderColorPicker(c):''}`).join('')}`}else if(t==='release'&&state.editingRelease){const r=state.editingRelease;const isNew=!state.releases.find(rel=>rel.id===r.id);const inherited=r.knownIssues.filter(i=>i.inheritedFrom).length;c.innerHTML=`<div class="flex justify-between items-center mb-6"><h2 class="dialog-title">${isNew?'Neues Release':'Release bearbeiten'}</h2><div class="flex gap-2"><button class="btn" onclick="hideModal()">Abbrechen</button><button class="btn btn-primary" onclick="saveRelease()">Speichern</button></div></div>${isNew&&inherited>0?`<div class="notice mb-4"><p class="text-sm"><strong>${inherited} offene${inherited===1?'r Fehler wurde':' Fehler wurden'} automatisch übernommen</strong></p></div>`:''}<div class="grid grid-cols-2 gap-4 mb-4"><div><label class="block text-sm font-medium mb-2">Version *</label><input type="text" value="${escInput(r.version)}" oninput="state.editingRelease.version=this.value" class="w-full px-3 py-2 rounded" placeholder="z.B. 2025.1.1"/></div><div><label class="block text-sm font-medium mb-2">Name (optional)</label><input type="text" value="${escInput(r.name||'')}" oninput="state.editingRelease.name=this.value" class="w-full px-3 py-2 rounded" placeholder="z.B. Stable Release"/></div></div><div class="mb-4"><label class="block text-sm font-medium mb-2">Datum</label><input type="date" value="${r.date}" oninput="state.editingRelease.date=this.value" class="w-full px-3 py-2 rounded"/></div><div class="border-t pt-4 mb-4 drop-zone" ondragover="handleDragOver(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event,'features')"><div class="flex justify-between mb-3"><h3 class="section-title">Neue Features</h3><button class="btn btn-sm" onclick="addItem('features')">+ Hinzufügen</button></div>${r.features.map(f=>`<div class="edit-row item-card" ondragover="handleCardDragOver(event)" ondragleave="handleCardDragLeave(event)" ondrop="handleCardDrop(event,'features',${f.id})"><div class="flex gap-2 mb-2"><span class="drag-handle" draggable="true" ondragstart="handleDragStart(event,'features',${f.id})" ondragend="handleDragEnd(event)" title="Verschieben">⠿</span><input type="text" value="${escInput(f.title)}" oninput="updateItem('features',${f.id},'title',this.value)" placeholder="Titel..." class="flex-1 px-2 py-1 rounded"/><select onchange="updateItem('features',${f.id},'category',this.value)" class="px-2 py-1 rounded">${[...state.categories].sort((a,b)=>a.label.localeCompare(b.label,'de')).map(c=>`<option value="${c.id}" ${f.category===c.id?'selected':''}>${c.label}</option>`).join('')}</select><button class="btn-icon btn-icon-danger" title="Entfernen" aria-label="Entfernen" onclick="removeItem('features',${f.id})">×</button></div><textarea oninput="updateItem('features',${f.id},'details',this.value)" placeholder="Details..." class="w-full px-2 py-1 rounded" rows="3">${escInput(f.details||'')}</textarea></div>`).join('')}${r.features.length===0?'<p class="text-gray-500 italic">Keine Features</p>':''}</div><div class="border-t pt-4 mb-4 drop-zone" ondragover="handleDragOver(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event,'changes')"><div class="flex justify-between mb-3"><h3 class="section-title">Änderungen / Bugfixes</h3><button class="btn btn-sm" onclick="addItem('changes')">+ Hinzufügen</button></div>${r.changes.map(c=>`<div class="edit-row item-card" ondragover="handleCardDragOver(event)" ondragleave="handleCardDragLeave(event)" ondrop="handleCardDrop(event,'changes',${c.id})"><div class="flex gap-2 mb-2"><span class="drag-handle" draggable="true" ondragstart="handleDragStart(event,'changes',${c.id})" ondragend="handleDragEnd(event)" title="Verschieben">⠿</span><input type="text" value="${escInput(c.title)}" oninput="updateItem('changes',${c.id},'title',this.value)" placeholder="Titel..." class="flex-1 px-2 py-1 rounded"/><select onchange="updateItem('changes',${c.id},'category',this.value)" class="px-2 py-1 rounded">${[...state.categories].sort((a,b)=>a.label.localeCompare(b.label,'de')).map(cat=>`<option value="${cat.id}" ${c.category===cat.id?'selected':''}>${cat.label}</option>`).join('')}</select><button class="btn-icon btn-icon-danger" title="Entfernen" aria-label="Entfernen" onclick="removeItem('changes',${c.id})">×</button></div><textarea oninput="updateItem('changes',${c.id},'details',this.value)" placeholder="Details..." class="w-full px-2 py-1 rounded" rows="3">${escInput(c.details||'')}</textarea></div>`).join('')}${r.changes.length===0?'<p class="text-gray-500 italic">Keine Änderungen</p>':''}</div><div class="border-t pt-4 mb-4"><div class="flex justify-between mb-3"><h3 class="section-title">Bekannte Fehler</h3><button class="btn btn-sm" onclick="addKnownIssue()">+ Hinzufügen</button></div>${r.knownIssues.map(i=>state.resolvingIssueId===i.id?`<div class="space-y-3"><div class="edit-row edit-row-done"><h4 class="font-semibold text-green-800 mb-2">✓ Fehler als gelöst markieren</h4><p class="text-sm text-green-700 mb-3">Fehler: <strong>${esc(i.title)}</strong></p><div class="space-y-2"><label class="block text-sm font-medium text-gray-700">In Version gelöst (optional):</label><input type="text" value="${escInput(state.resolveVersion)}" oninput="state.resolveVersion=this.value" placeholder="${r.version}" class="w-full px-3 py-2 border rounded"/><label class="block text-sm font-medium text-gray-700 mt-3">Beschreibung der Lösung (optional):</label><textarea oninput="state.resolvingSolution=this.value" placeholder="Beschreibe wie der Fehler gelöst wurde..." class="w-full px-3 py-2 border rounded" rows="3">${escInput(state.resolvingSolution)}</textarea></div><div class="flex gap-2 mt-3"><button class="btn btn-primary" onclick="confirmResolveIssue()">${state.resolvingSolution.trim()?'Lösung dokumentieren':'Als gelöst markieren'}</button><button class="btn" onclick="cancelResolveIssue()">Abbrechen</button></div></div></div>`:i.status==='resolved'?`<div class="edit-row edit-row-done"><div class="flex gap-2 mb-2 items-start"><span class="chip chip-done">✓ Gelöst in ${esc(i.resolvedInVersion||'?')}</span><div class="flex-1"><div class="font-medium text-gray-600 line-through">${esc(i.title)}</div>${i.resolution?`<p class="text-sm text-gray-600">${esc(i.resolution)}</p>`:''}</div><button class="btn btn-sm" onclick="reopenIssue(${i.id})" title="Fehler wieder öffnen">Wieder öffnen</button></div></div>`:`<div class="edit-row edit-row-issue"><div class="flex gap-2 mb-2"><input type="text" value="${escInput(i.title)}" oninput="updateKnownIssue(${i.id},'title',this.value)" placeholder="Fehler..." class="flex-1 px-2 py-1 rounded"/><select onchange="updateKnownIssue(${i.id},'category',this.value)" class="px-2 py-1 rounded">${[...state.categories].sort((a,b)=>a.label.localeCompare(b.label,'de')).map(cat=>`<option value="${cat.id}" ${(i.category||'general')===cat.id?'selected':''}>${cat.label}</option>`).join('')}</select><button class="btn btn-sm btn-success" onclick="startResolveIssue(${i.id})" title="Als gelöst markieren">✓ Gelöst</button><button class="btn-icon btn-icon-danger" title="Entfernen" aria-label="Entfernen" onclick="removeKnownIssue(${i.id})">×</button></div><textarea oninput="updateKnownIssue(${i.id},'details',this.value)" placeholder="Details..." class="w-full px-2 py-1 rounded" rows="2">${escInput(i.details||'')}</textarea></div>`).join('')}${r.knownIssues.length===0?'<p class="text-gray-500 italic">Keine bekannten Fehler</p>':''}</div><div class="border-t pt-4"><label class="block text-sm font-medium mb-2">Kommentare (optional)</label><textarea oninput="state.editingRelease.comments=this.value" class="w-full px-3 py-2 rounded" rows="3" placeholder="Zusätzliche Informationen...">${escInput(r.comments||'')}</textarea></div><div class="border-t pt-4 mt-4 flex justify-end"><button class="btn btn-danger" onclick="deleteCurrentRelease()">Release vollständig löschen</button></div>`}else if(t==='settings'){c.innerHTML=`<div class="flex justify-between items-center mb-6"><h2 class="dialog-title">Einstellungen</h2><button class="btn" onclick="hideModal()">Schließen</button></div><div class="panel mb-4"><h3 class="panel-title">Darstellung</h3><p class="text-sm text-gray-600 mb-3">„Automatisch“ übernimmt das aktive Home-Assistant-Theme, außerhalb von Home Assistant die Systemeinstellung.</p><div class="seg" role="group" aria-label="Darstellung" data-theme-switch>${themeSwitchButtons()}</div></div><div class="panel mb-4"><h3 class="panel-title">Automatische Update-Dokumentation</h3><p class="text-sm text-gray-600 mb-3">Erstellt automatisch Release-Notes-Einträge, wenn Home-Assistant-Update-Entitäten ein Update abschließen oder neu hinzukommen/verschwinden.</p><label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" ${state.settings.autoUpdateDocs?'checked':''} onchange="toggleAutoUpdateDocs(this.checked)"/><span class="text-sm">Automatische Update-Dokumentation aktiviert</span></label></div><div class="panel mb-4"><h3 class="panel-title">Daten</h3><p class="text-sm text-gray-600 mb-3">Datenstand sichern oder aus einer Sicherung wiederherstellen.</p><div class="flex gap-2"><button class="btn" onclick="exportData()">Exportieren</button><button class="btn" onclick="document.getElementById('import-file-input').click()">Importieren</button></div></div>`}}
+function renderModal(){const m=document.getElementById('modal');const c=m.querySelector('.modal-content');const t=m.dataset.type;if(t==='stats'){renderStatsModal(c)}else if(t==='categories'){c.innerHTML=`<div class="flex justify-between items-center mb-6"><h2 class="dialog-title">Kategorien verwalten</h2><button class="btn" onclick="hideModal()">Schließen</button></div><div class="mb-6"><label class="block text-sm font-medium mb-2">Neue Kategorie</label><div class="flex gap-2"><input type="text" id="new-cat-input" placeholder="Name..." class="flex-1 px-3 py-2 rounded" onkeypress="if(event.key==='Enter')addCategory()"/><button class="btn btn-primary" onclick="addCategory()">+ Hinzufügen</button></div></div>${[...state.categories].sort((a,b)=>a.label.localeCompare(b.label,'de')).map(c=>state.editingCatId===c.id?`<div class="cat-row"><input type="text" value="${escInput(state.editingCatLabel)}" oninput="state.editingCatLabel=this.value" class="flex-1 px-2 py-1 rounded" onkeypress="if(event.key==='Enter')saveEditCat()"/><button class="btn btn-sm btn-primary" onclick="saveEditCat()">Speichern</button><button class="btn btn-sm" onclick="cancelEditCat()">Abbrechen</button></div>`:`<div class="cat-row"><span class="lbl ${lblClass(c.color)} lbl-pick" role="button" tabindex="0" aria-expanded="${state.colorPickerCatId===c.id}" onclick="toggleColorPicker('${c.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleColorPicker('${c.id}')}" title="Klicken um Farbe zu ändern">${esc(c.label)}</span><div class="flex gap-2"><button class="btn btn-sm" onclick="startEditCat('${c.id}','${esc(c.label)}')">Name ändern</button><button class="btn btn-sm btn-danger" onclick="deleteCategory('${c.id}')">Löschen</button></div></div>${state.colorPickerCatId===c.id?renderColorPicker(c):''}`).join('')}`}else if(t==='release'&&state.editingRelease){const r=state.editingRelease;const isNew=!state.releases.find(rel=>rel.id===r.id);const inherited=r.knownIssues.filter(i=>i.inheritedFrom).length;c.innerHTML=`<div class="flex justify-between items-center mb-6"><h2 class="dialog-title">${isNew?'Neues Release':'Release bearbeiten'}</h2><div class="flex gap-2"><button class="btn" onclick="hideModal()">Abbrechen</button><button class="btn btn-primary" onclick="saveRelease()">Speichern</button></div></div>${isNew&&inherited>0?`<div class="notice mb-4"><p class="text-sm"><strong>${inherited} offene${inherited===1?'r Fehler wurde':' Fehler wurden'} automatisch übernommen</strong></p></div>`:''}<div class="grid grid-cols-2 gap-4 mb-4"><div><label class="block text-sm font-medium mb-2">Version *</label><input type="text" value="${escInput(r.version)}" oninput="state.editingRelease.version=this.value;updateVersionHint()" class="w-full px-3 py-2 rounded" placeholder="${versionPlaceholder()}" aria-describedby="version-hint"/><div id="version-hint" class="version-hint" aria-live="polite"${versionHintText(r.version)?'':' hidden'}>${esc(versionHintText(r.version))}</div></div><div><label class="block text-sm font-medium mb-2">Name (optional)</label><input type="text" value="${escInput(r.name||'')}" oninput="state.editingRelease.name=this.value" class="w-full px-3 py-2 rounded" placeholder="z.B. Stable Release"/></div></div><div class="mb-4"><label class="block text-sm font-medium mb-2">Datum</label><input type="date" value="${r.date}" oninput="state.editingRelease.date=this.value" class="w-full px-3 py-2 rounded"/></div><div class="border-t pt-4 mb-4 drop-zone" ondragover="handleDragOver(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event,'features')"><div class="flex justify-between mb-3"><h3 class="section-title">Neue Features</h3><button class="btn btn-sm" onclick="addItem('features')">+ Hinzufügen</button></div>${r.features.map(f=>`<div class="edit-row item-card" ondragover="handleCardDragOver(event)" ondragleave="handleCardDragLeave(event)" ondrop="handleCardDrop(event,'features',${f.id})"><div class="flex gap-2 mb-2"><span class="drag-handle" draggable="true" ondragstart="handleDragStart(event,'features',${f.id})" ondragend="handleDragEnd(event)" title="Verschieben">⠿</span><input type="text" value="${escInput(f.title)}" oninput="updateItem('features',${f.id},'title',this.value)" placeholder="Titel..." class="flex-1 px-2 py-1 rounded"/><select onchange="updateItem('features',${f.id},'category',this.value)" class="px-2 py-1 rounded">${[...state.categories].sort((a,b)=>a.label.localeCompare(b.label,'de')).map(c=>`<option value="${c.id}" ${f.category===c.id?'selected':''}>${c.label}</option>`).join('')}</select><button class="btn-icon btn-icon-danger" title="Entfernen" aria-label="Entfernen" onclick="removeItem('features',${f.id})">×</button></div><textarea oninput="updateItem('features',${f.id},'details',this.value)" placeholder="Details..." class="w-full px-2 py-1 rounded" rows="3">${escInput(f.details||'')}</textarea></div>`).join('')}${r.features.length===0?'<p class="text-gray-500 italic">Keine Features</p>':''}</div><div class="border-t pt-4 mb-4 drop-zone" ondragover="handleDragOver(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event,'changes')"><div class="flex justify-between mb-3"><h3 class="section-title">Änderungen / Bugfixes</h3><button class="btn btn-sm" onclick="addItem('changes')">+ Hinzufügen</button></div>${r.changes.map(c=>`<div class="edit-row item-card" ondragover="handleCardDragOver(event)" ondragleave="handleCardDragLeave(event)" ondrop="handleCardDrop(event,'changes',${c.id})"><div class="flex gap-2 mb-2"><span class="drag-handle" draggable="true" ondragstart="handleDragStart(event,'changes',${c.id})" ondragend="handleDragEnd(event)" title="Verschieben">⠿</span><input type="text" value="${escInput(c.title)}" oninput="updateItem('changes',${c.id},'title',this.value)" placeholder="Titel..." class="flex-1 px-2 py-1 rounded"/><select onchange="updateItem('changes',${c.id},'category',this.value)" class="px-2 py-1 rounded">${[...state.categories].sort((a,b)=>a.label.localeCompare(b.label,'de')).map(cat=>`<option value="${cat.id}" ${c.category===cat.id?'selected':''}>${cat.label}</option>`).join('')}</select><button class="btn-icon btn-icon-danger" title="Entfernen" aria-label="Entfernen" onclick="removeItem('changes',${c.id})">×</button></div><textarea oninput="updateItem('changes',${c.id},'details',this.value)" placeholder="Details..." class="w-full px-2 py-1 rounded" rows="3">${escInput(c.details||'')}</textarea></div>`).join('')}${r.changes.length===0?'<p class="text-gray-500 italic">Keine Änderungen</p>':''}</div><div class="border-t pt-4 mb-4"><div class="flex justify-between mb-3"><h3 class="section-title">Bekannte Fehler</h3><button class="btn btn-sm" onclick="addKnownIssue()">+ Hinzufügen</button></div>${r.knownIssues.map(i=>state.resolvingIssueId===i.id?`<div class="space-y-3"><div class="edit-row edit-row-done"><h4 class="font-semibold text-green-800 mb-2">✓ Fehler als gelöst markieren</h4><p class="text-sm text-green-700 mb-3">Fehler: <strong>${esc(i.title)}</strong></p><div class="space-y-2"><label class="block text-sm font-medium text-gray-700">In Version gelöst (optional):</label><input type="text" value="${escInput(state.resolveVersion)}" oninput="state.resolveVersion=this.value" placeholder="${r.version}" class="w-full px-3 py-2 border rounded"/><label class="block text-sm font-medium text-gray-700 mt-3">Beschreibung der Lösung (optional):</label><textarea oninput="state.resolvingSolution=this.value" placeholder="Beschreibe wie der Fehler gelöst wurde..." class="w-full px-3 py-2 border rounded" rows="3">${escInput(state.resolvingSolution)}</textarea></div><div class="flex gap-2 mt-3"><button class="btn btn-primary" onclick="confirmResolveIssue()">${state.resolvingSolution.trim()?'Lösung dokumentieren':'Als gelöst markieren'}</button><button class="btn" onclick="cancelResolveIssue()">Abbrechen</button></div></div></div>`:i.status==='resolved'?`<div class="edit-row edit-row-done"><div class="flex gap-2 mb-2 items-start"><span class="chip chip-done">✓ Gelöst in ${esc(i.resolvedInVersion||'?')}</span><div class="flex-1"><div class="font-medium text-gray-600 line-through">${esc(i.title)}</div>${i.resolution?`<p class="text-sm text-gray-600">${esc(i.resolution)}</p>`:''}</div><button class="btn btn-sm" onclick="reopenIssue(${i.id})" title="Fehler wieder öffnen">Wieder öffnen</button></div></div>`:`<div class="edit-row edit-row-issue"><div class="flex gap-2 mb-2"><input type="text" value="${escInput(i.title)}" oninput="updateKnownIssue(${i.id},'title',this.value)" placeholder="Fehler..." class="flex-1 px-2 py-1 rounded"/><select onchange="updateKnownIssue(${i.id},'category',this.value)" class="px-2 py-1 rounded">${[...state.categories].sort((a,b)=>a.label.localeCompare(b.label,'de')).map(cat=>`<option value="${cat.id}" ${(i.category||'general')===cat.id?'selected':''}>${cat.label}</option>`).join('')}</select><button class="btn btn-sm btn-success" onclick="startResolveIssue(${i.id})" title="Als gelöst markieren">✓ Gelöst</button><button class="btn-icon btn-icon-danger" title="Entfernen" aria-label="Entfernen" onclick="removeKnownIssue(${i.id})">×</button></div><textarea oninput="updateKnownIssue(${i.id},'details',this.value)" placeholder="Details..." class="w-full px-2 py-1 rounded" rows="2">${escInput(i.details||'')}</textarea></div>`).join('')}${r.knownIssues.length===0?'<p class="text-gray-500 italic">Keine bekannten Fehler</p>':''}</div><div class="border-t pt-4"><label class="block text-sm font-medium mb-2">Kommentare (optional)</label><textarea oninput="state.editingRelease.comments=this.value" class="w-full px-3 py-2 rounded" rows="3" placeholder="Zusätzliche Informationen...">${escInput(r.comments||'')}</textarea></div><div class="border-t pt-4 mt-4 flex justify-end"><button class="btn btn-danger" onclick="deleteCurrentRelease()">Release vollständig löschen</button></div>`}else if(t==='settings'){c.innerHTML=`<div class="flex justify-between items-center mb-6"><h2 class="dialog-title">Einstellungen</h2><button class="btn" onclick="hideModal()">Schließen</button></div><div class="panel mb-4"><h3 class="panel-title">Darstellung</h3><p class="text-sm text-gray-600 mb-3">„Automatisch“ übernimmt das aktive Home-Assistant-Theme, außerhalb von Home Assistant die Systemeinstellung.</p><div class="seg" role="group" aria-label="Darstellung" data-theme-switch>${themeSwitchButtons()}</div></div>${renderVersionSettings()}<div class="panel mb-4"><h3 class="panel-title">Automatische Update-Dokumentation</h3><p class="text-sm text-gray-600 mb-3">Erstellt automatisch Release-Notes-Einträge, wenn Home-Assistant-Update-Entitäten ein Update abschließen oder neu hinzukommen/verschwinden.</p><label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" ${state.settings.autoUpdateDocs?'checked':''} onchange="toggleAutoUpdateDocs(this.checked)"/><span class="text-sm">Automatische Update-Dokumentation aktiviert</span></label></div><div class="panel mb-4"><h3 class="panel-title">Daten</h3><p class="text-sm text-gray-600 mb-3">Datenstand sichern oder aus einer Sicherung wiederherstellen.</p><div class="flex gap-2"><button class="btn" onclick="exportData()">Exportieren</button><button class="btn" onclick="document.getElementById('import-file-input').click()">Importieren</button></div></div>`}}
 async function toggleAutoUpdateDocs(enabled){state.settings.autoUpdateDocs=enabled;await saveData()}
 function esc(t){const d=document.createElement('div');d.textContent=t||'';return d.innerHTML.replace(/\n/g,'<br>')}
 // Für editierbare Felder (value=""/<textarea>): NICHT \n->br wandeln, sonst
@@ -534,7 +1057,7 @@ document.getElementById('search-input').addEventListener('input',e=>{state.searc
 document.getElementById('category-filter').addEventListener('change',e=>{state.filterCategory=e.target.value;render()});
 // Einzige Quelle für die Admin-Version dieser Datei. Nur erhöhen, wenn an
 // DIESER Datei etwas geändert wurde (unabhängig von der Backend-Version).
-const ADMIN_VERSION = '0.7.0';
+const ADMIN_VERSION = '0.8.0';
 document.title = 'Home Assistant Release Notes Manager - Admin v' + ADMIN_VERSION;
 document.getElementById('version-meta').setAttribute('content', ADMIN_VERSION);
 console.log('🚀 Home Assistant Release Notes Manager (Admin v' + ADMIN_VERSION + ') startet...');
@@ -588,7 +1111,7 @@ checkVersionAndReload().then(reloading => {
 
   <!-- Versions-Anzeige -->
   <div id="version-footer" class="version-footer">
-    Admin: v0.7.0
+    Admin: v0.8.0
   </div>
 </body>
 </html>

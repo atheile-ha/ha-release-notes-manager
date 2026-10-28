@@ -177,7 +177,11 @@ class ReleaseNotesStorage:
     def _get_default_settings(self) -> dict[str, Any]:
         """Get default settings."""
         return {
-            "autoUpdateDocs": True
+            "autoUpdateDocs": True,
+            # Versionsschema fuer neue Releases: "calver" (YYYY.MM.ZZ) oder "semver" (xx.yy.zz)
+            "versionScheme": "calver",
+            # Nur calver: Version beim manuellen Anlegen eines Releases vorausfuellen
+            "versionPrefill": False
         }
 
 
