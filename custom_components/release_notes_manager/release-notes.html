@@ -4,12 +4,12 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <meta id="version-meta" name="version" content="0.8.0">
+  <meta id="version-meta" name="version" content="0.8.1">
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2064%2064%22%3E%3Crect%20width=%2264%22%20height=%2264%22%20rx=%2214%22%20fill=%22%234338ca%22/%3E%3Crect%20x=%2216%22%20y=%2211%22%20width=%2228%22%20height=%2238%22%20rx=%224%22%20fill=%22%23ffffff%22/%3E%3Cpath%20d=%22M36%2011H44V19Z%22%20fill=%22%234338ca%22/%3E%3Cpath%20d=%22M36%2011V19H44Z%22%20fill=%22%23c7d2fe%22/%3E%3Crect%20x=%2221%22%20y=%2225%22%20width=%2218%22%20height=%223%22%20rx=%221.5%22%20fill=%22%236462a0%22/%3E%3Crect%20x=%2221%22%20y=%2231%22%20width=%2214%22%20height=%223%22%20rx=%221.5%22%20fill=%22%236462a0%22/%3E%3Crect%20x=%2221%22%20y=%2237%22%20width=%2210%22%20height=%223%22%20rx=%221.5%22%20fill=%22%236462a0%22/%3E%3Crect%20x=%2232%22%20y=%2240%22%20width=%2225%22%20height=%2215%22%20rx=%227.5%22%20fill=%22%23fbbf24%22/%3E%3Crect%20x=%2238%22%20y=%2245%22%20width=%2213%22%20height=%225%22%20rx=%222.5%22%20fill=%22%23312e81%22/%3E%3C/svg%3E">
-  <title>Home Assistant Release Notes Manager - Admin v0.8.0</title>
+  <title>Release Notes Manager - Admin v0.8.1</title>
   <style>
     /* Farben: Standardwerte des HA-Themes (hell/dunkel). Im HA-iframe überschreibt
        applyTheme() sie mit den Werten des aktiven HA-Themes. */
@@ -307,8 +307,17 @@
 
     /* Statistik-Popup */
     .st-body { display: flex; flex-direction: column; gap: 0.875rem; min-width: 0; }
-    .st-ctl { display: flex; flex-wrap: wrap; gap: 0.625rem 1.125rem; align-items: center; }
-    .st-grp { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; min-width: 0; }
+    .st-ctl { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17.5rem), 1fr)); gap: 0.625rem 1.125rem; align-items: start; }
+    .st-grp { display: flex; flex-direction: column; align-items: flex-start; gap: 0.25rem; min-width: 0; max-width: 100%; }
+    .st-cats { border: 1px solid var(--divider-color); border-radius: 10px; padding: 0.5rem 0.75rem; }
+    .st-cats summary { cursor: pointer; display: flex; align-items: center; gap: 0.5rem; list-style: none; position: relative; padding-right: 1.5rem; }
+    .st-cats summary::-webkit-details-marker { display: none; }
+    .st-cats summary::after { content: ""; position: absolute; top: 50%; right: 4px; width: 6px; height: 6px; margin-top: -5px; border-right: 2px solid var(--secondary-text-color); border-bottom: 2px solid var(--secondary-text-color); transform: rotate(45deg); }
+    .st-cats[open] summary::after { margin-top: -1px; transform: rotate(-135deg); }
+    .st-cats summary:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; border-radius: 6px; }
+    .st-cats[open] summary { margin-bottom: 0.5rem; }
+    .st-cats-state { font-size: 0.8rem; color: var(--secondary-text-color); }
+    .st-switch-wrap { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--secondary-text-color); }
     .st-grp .seg { max-width: 100%; overflow-x: auto; }
     .st-grp .seg button { white-space: nowrap; }
     .st-cap { font-size: 0.72rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--secondary-text-color); }
@@ -372,7 +381,7 @@
         <div class="header-title">
           <svg class="ha-logo" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#4338ca"/><rect x="16" y="11" width="28" height="38" rx="4" fill="#ffffff"/><path d="M36 11H44V19Z" fill="#4338ca"/><path d="M36 11V19H44Z" fill="#c7d2fe"/><rect x="21" y="25" width="18" height="3" rx="1.5" fill="#6462a0"/><rect x="21" y="31" width="14" height="3" rx="1.5" fill="#6462a0"/><rect x="21" y="37" width="10" height="3" rx="1.5" fill="#6462a0"/><rect x="32" y="40" width="25" height="15" rx="7.5" fill="#fbbf24"/><rect x="38" y="45" width="13" height="5" rx="2.5" fill="#312e81"/></svg>
           <div>
-            <h1 class="app-title">Home Assistant Release Notes Manager</h1>
+            <h1 class="app-title">Release Notes Manager</h1>
             <p class="save-status" id="save-status"></p>
           </div>
         </div>
@@ -671,7 +680,7 @@ const StatsCore = (function () {
     const buckets = [], idx = new Map();
     for (let s = bucketStart(from, g); s <= to; s = nextBucket(s, g)) {
       idx.set(s, buckets.length);
-      buckets.push({ start: s, end: Math.min(nextBucket(s, g) - DAY, to), releases: 0, features: 0, changes: 0, bugs: 0, open: 0 });
+      buckets.push({ start: s, end: Math.min(nextBucket(s, g) - DAY, to), releases: 0, features: 0, changes: 0, bugs: 0, open: 0, active: 0 });
     }
     const issues = issueTimeline(releases), bugRelease = new Set();
     issues.forEach(e => {
@@ -694,7 +703,10 @@ const StatsCore = (function () {
     });
     buckets.forEach(b => {
       issues.forEach(e => {
-        if (match(e.category) && toMs(e.opened) <= b.end && (!e.resolved || toMs(e.resolved) > b.end)) b.open++;
+        if (!match(e.category) || toMs(e.opened) > b.end) return;
+        // gesamt: in diesem Zeitabschnitt zu irgendeinem Zeitpunkt offen (auch die dort gelösten); offen: am Ende noch offen
+        if (!e.resolved || toMs(e.resolved) >= b.start) b.active++;
+        if (!e.resolved || toMs(e.resolved) > b.end) b.open++;
       });
     });
     const totals = buckets.reduce((a, b) => {
@@ -723,14 +735,16 @@ const StatsCore = (function () {
 const STATS_MONTHS = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
 const STATS_MONTHS_LONG = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 const STATS_RANGES = [['3m','3 Monate'], ['6m','6 Monate'], ['12m','1 Jahr'], ['all','Alles']];
-const STATS_GRAN_LABEL = {auto: 'Auto', day: 'Tag', week: 'Woche', month: 'Monat', year: 'Jahr'};
+const STATS_GRAN_LABEL = {day: 'Tag', week: 'Woche', month: 'Monat', year: 'Jahr'};
+// Ab so vielen Zeitabschnitten wird die gewählte Auflösung gesperrt (Tag bei etwa vier Jahren)
+const STATS_MAX_BUCKETS = 1500;
 const STATS_SERIES = [
   {key: 'features', label: 'Features', color: 'var(--st-feat)'},
   {key: 'changes', label: 'Änderungen', color: 'var(--st-chg)'},
   {key: 'bugs', label: 'Neue Bugs', color: 'var(--st-bug)'}
 ];
 const STATS_ML = 34, STATS_MR = 12, STATS_MT = 10;
-const statsUi = {range: 'all', gran: 'auto', mode: 'bars', hidden: new Set(), deselected: new Set(), hover: -1, view: null, P: null, ro: null, raf: 0, bounds: null};
+const statsUi = {range: 'all', gran: 'week', mode: 'bars', bugView: 'open', hidden: new Set(), deselected: new Set(), hover: -1, view: null, P: null, ro: null, raf: 0, bounds: null};
 const stEl = id => document.getElementById(id);
 
 function statsToday() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
@@ -763,7 +777,7 @@ function statsBounds() {
   return {from: Math.min(from, to), to};
 }
 function statsEffGran(rb) {
-  if (statsUi.gran !== 'auto' && StatsCore.bucketCount(rb.from, rb.to, statsUi.gran) <= 120) return statsUi.gran;
+  if (StatsCore.bucketCount(rb.from, rb.to, statsUi.gran) <= STATS_MAX_BUCKETS) return statsUi.gran;
   return StatsCore.pickGran(rb.from, rb.to);
 }
 function statsSeg(el, items, cur, isDisabled) {
@@ -778,7 +792,7 @@ function renderStatsModal(c) {
     <div class="st-grp"><span class="st-cap">Auflösung</span><div class="seg" id="st-gran"></div></div>
     <div class="st-grp"><span class="st-cap">Darstellung</span><div class="seg" id="st-mode"></div></div>
   </div>
-  <div class="st-chips" id="st-chips" role="group" aria-label="Kategorien"></div>
+  <details class="st-cats" id="st-cats"><summary id="st-cats-sum"></summary><div class="st-chips" id="st-chips" role="group" aria-label="Kategorien"></div></details>
   <div class="st-tiles" id="st-tiles"></div>
   <div id="st-area">
     <div class="st-plots" id="st-plots" tabindex="0" aria-label="Zeitverlauf. Mit den Pfeiltasten durch die Zeitabschnitte gehen.">
@@ -786,14 +800,14 @@ function renderStatsModal(c) {
       <svg id="st-svg-rel" role="img" aria-label="Releases pro Zeitabschnitt"></svg>
       <div class="st-panel-h"><div class="st-panel-t">Neue Einträge</div><div class="st-legend" id="st-legend"></div></div>
       <svg id="st-svg-main" role="img" aria-label="Features, Änderungen und neue Bugs pro Zeitabschnitt"></svg>
-      <div class="st-panel-h"><div class="st-panel-t"><i style="background:var(--st-bug)"></i>Offene Bugs am Ende des Zeitabschnitts</div></div>
-      <svg id="st-svg-open" role="img" aria-label="Bestand offener Bugs"></svg>
+      <div class="st-panel-h"><div class="st-panel-t"><i style="background:var(--st-bug)"></i><span id="st-bug-title"></span></div><div class="st-switch-wrap"><span id="st-bugview-lbl">Alle Bugs im Zeitraum</span><button type="button" class="vs-switch" role="switch" id="st-bugview" aria-labelledby="st-bugview-lbl" title="Zeigt alle Bugs, die im Zeitabschnitt offen waren, statt nur die am Ende noch offenen"></button></div></div>
+      <svg id="st-svg-open" role="img"></svg>
       <div class="st-tip" id="st-tip" hidden></div>
     </div>
     <details class="st-details" style="margin-top:0.75rem"><summary>Wertetabelle anzeigen</summary><div class="st-tbl-wrap" id="st-tbl"></div></details>
   </div>
   <div class="st-empty" id="st-empty" hidden></div>
-  <p class="text-xs text-gray-600">„Neue Bugs“ zählt Known Issues im Zeitabschnitt ihres ersten Auftretens. „Offene Bugs“ ist der Bestand am Ende des Zeitabschnitts.</p>
+  <p class="text-xs text-gray-600">„Neue Bugs“ zählt Known Issues im Zeitabschnitt ihres ersten Auftretens. „Offene Bugs“ ist der Bestand am Ende des Zeitabschnitts, „Alle Bugs im Zeitraum“ zählt jeden Bug, der dort zu irgendeinem Zeitpunkt offen war.</p>
 </div>`;
   statsBind();
   statsDraw();
@@ -808,6 +822,7 @@ function statsBind() {
     const again = stEl(id) && stEl(id).querySelectorAll('button')[idx];
     if (again) again.focus();
   });
+  stEl('st-bugview').addEventListener('click', () => { statsUi.bugView = statsUi.bugView === 'total' ? 'open' : 'total'; statsDraw(); });
   on('st-range', b => { statsUi.range = b.dataset.v; statsUi.hover = -1; statsDraw(); });
   on('st-gran', b => { statsUi.gran = b.dataset.v; statsUi.hover = -1; statsDraw(); });
   on('st-mode', b => { statsUi.mode = b.dataset.v; statsDraw(); });
@@ -856,13 +871,17 @@ function statsClose() {
   statsUi.hover = -1; statsUi.view = null; statsUi.P = null;
 }
 function statsRenderControls(rb) {
-  const hasData = state.releases.length > 0;
   statsSeg(stEl('st-range'), STATS_RANGES, statsUi.range);
-  const shown = statsUi.gran === 'auto' || StatsCore.bucketCount(rb.from, rb.to, statsUi.gran) > 120 ? 'auto' : statsUi.gran;
-  statsSeg(stEl('st-gran'), Object.keys(STATS_GRAN_LABEL).map(k => [k, k === 'auto' && hasData ? 'Auto (' + STATS_GRAN_LABEL[statsEffGran(rb)] + ')' : STATS_GRAN_LABEL[k]]), shown,
-    k => k !== 'auto' && StatsCore.bucketCount(rb.from, rb.to, k) > 120);
+  statsSeg(stEl('st-gran'), Object.keys(STATS_GRAN_LABEL).map(k => [k, STATS_GRAN_LABEL[k]]), statsEffGran(rb),
+    k => StatsCore.bucketCount(rb.from, rb.to, k) > STATS_MAX_BUCKETS);
   statsSeg(stEl('st-mode'), [['bars', 'Balken'], ['lines', 'Linien']], statsUi.mode);
-  stEl('st-chips').innerHTML = '<span class="st-cap">Kategorien</span>' + [...state.categories].sort((a, b) => a.label.localeCompare(b.label, 'de')).map(c =>
+  const total = state.categories.length, active = state.categories.filter(c => !statsUi.deselected.has(c.id)).length;
+  stEl('st-cats-sum').innerHTML = '<span class="st-cap">Kategorien</span> <span class="st-cats-state">' + (active === total ? 'alle aktiv' : active + ' von ' + total + ' aktiv') + '</span>';
+  const showTotal = statsUi.bugView === 'total';
+  stEl('st-bug-title').textContent = showTotal ? 'Bugs im Zeitabschnitt gesamt' : 'Offene Bugs am Ende des Zeitabschnitts';
+  stEl('st-svg-open').setAttribute('aria-label', showTotal ? 'Bugs, die im Zeitabschnitt offen waren' : 'Bestand offener Bugs am Ende des Zeitabschnitts');
+  stEl('st-bugview').setAttribute('aria-checked', String(showTotal));
+  stEl('st-chips').innerHTML = [...state.categories].sort((a, b) => a.label.localeCompare(b.label, 'de')).map(c =>
     `<button type="button" class="st-chip ${lblClass(c.color)}" data-id="${escInput(c.id)}" aria-pressed="${!statsUi.deselected.has(c.id)}"><i></i>${esc(c.label)}</button>`).join('') +
     '<button type="button" class="st-mini" data-all="1">Alle</button><button type="button" class="st-mini" data-none="1">Keine</button>';
   stEl('st-legend').innerHTML = STATS_SERIES.map(s =>
@@ -895,7 +914,7 @@ function statsDraw() {
     ['Änderungen', t.changes, 'var(--st-chg)', 'im Zeitraum'], ['Neue Bugs', t.bugs, 'var(--st-bug)', 'im Zeitraum'],
     ['Offene Bugs', t.open, 'var(--st-bug)', 'Stand ' + stand]
   ].map(x => `<div class="st-tile"><div class="st-tile-l"><i style="background:${x[2]}"></i>${x[0]}</div><div class="st-tile-v">${x[1]}</div><div class="st-tile-s">${x[3]}</div></div>`).join('');
-  const total = t.releases + t.features + t.changes + t.bugs + S.buckets.reduce((a, b) => a + b.open, 0);
+  const total = t.releases + t.features + t.changes + t.bugs + S.buckets.reduce((a, b) => a + b.active, 0);
   if (!total) {
     area.hidden = true; empty.hidden = false;
     empty.innerHTML = '<b>Keine Einträge für diese Auswahl</b>' + (statsUi.deselected.size >= known.size ? 'Es ist keine Kategorie ausgewählt.' : 'Im gewählten Zeitraum gibt es zu diesen Kategorien nichts. Wähle weitere Kategorien oder einen größeren Zeitraum.');
@@ -923,7 +942,7 @@ function statsFrame(svg, W, H, mb, max) {
 }
 function statsCharts(S) {
   const W = Math.max(280, stEl('st-plots').clientWidth), n = S.buckets.length, slot = (W - STATS_ML - STATS_MR) / n, g = S.gran;
-  const bw = Math.max(2, Math.min(24, slot * 0.72)), gap = Math.min(2, bw * 0.25);
+  const bw = Math.max(1, Math.min(24, slot * 0.72)), gap = slot < 4 ? 0 : Math.min(2, bw * 0.25);
   const vis = STATS_SERIES.filter(s => !statsUi.hidden.has(s.key));
   const P = statsUi.P = {W, n, slot, vis};
   const cx = i => STATS_ML + slot * (i + 0.5);
@@ -971,20 +990,21 @@ function statsCharts(S) {
   P.main = f2;
 
   // Offene Bugs
-  const f3 = statsFrame(stEl('st-svg-open'), W, 150, 26, Math.max(1, ...S.buckets.map(b => b.open)));
+  const bugKey = statsUi.bugView === 'total' ? 'active' : 'open';
+  const f3 = statsFrame(stEl('st-svg-open'), W, 150, 26, Math.max(1, ...S.buckets.map(b => b[bugKey])));
   let h3 = f3.html;
   const labelStep = Math.max(1, Math.ceil(56 / slot));
   S.buckets.forEach((b, i) => {
     if (i % labelStep || cx(i) > W - STATS_MR - 14) return;
     h3 += `<text class="st-tick" x="${cx(i)}" y="${f3.H - 6}" text-anchor="middle">${statsTickLabel(b, g)}</text>`;
   });
-  let pts = S.buckets.map((b, i) => [cx(i), f3.y(b.open)]);
+  let pts = S.buckets.map((b, i) => [cx(i), f3.y(b[bugKey])]);
   if (n === 1) pts = [[cx(0) - 6, pts[0][1]], [cx(0) + 6, pts[0][1]]];
   const line = pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' '), lp = pts[pts.length - 1];
   h3 += `<polygon points="${pts[0][0]},${f3.y(0)} ${line} ${lp[0]},${f3.y(0)}" fill="var(--st-bug)" fill-opacity=".1"/>` +
     `<polyline points="${line}" fill="none" stroke="var(--st-bug)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>` +
     `<circle cx="${lp[0]}" cy="${lp[1]}" r="4" fill="var(--st-bug)" stroke="var(--rn-card)" stroke-width="2"/>` +
-    `<text class="st-endlbl" x="${lp[0] - 8}" y="${Math.max(STATS_MT + 12, lp[1] - 10)}" text-anchor="end">${S.buckets[n - 1].open} offen</text>`;
+    `<text class="st-endlbl" x="${lp[0] - (lp[1] - 10 < STATS_MT + 12 ? 12 : 8)}" y="${lp[1] - 10 < STATS_MT + 12 ? lp[1] + 4 : lp[1] - 10}" text-anchor="end">${S.buckets[n - 1][bugKey]} ${bugKey === 'active' ? 'gesamt' : 'offen'}</text>`;
   stEl('st-svg-open').innerHTML = h3 + '<g class="ov"></g>';
   P.open = f3;
 }
@@ -998,20 +1018,20 @@ function statsOverlay(i) {
     const f = P[k], ov = stEl('st-svg-' + k).querySelector('.ov');
     let html = `<rect x="${STATS_ML + P.slot * i}" y="${STATS_MT}" width="${P.slot}" height="${f.ph}" fill="var(--st-wash)"/>`;
     if (k === 'main' && statsUi.mode === 'lines') P.vis.forEach(s => { html += `<circle cx="${x}" cy="${f.y(b[s.key])}" r="5" fill="${s.color}" stroke="var(--rn-card)" stroke-width="2"/>`; });
-    if (k === 'open') html += `<circle cx="${x}" cy="${f.y(b.open)}" r="5" fill="var(--st-bug)" stroke="var(--rn-card)" stroke-width="2"/>`;
+    if (k === 'open') html += `<circle cx="${x}" cy="${f.y(b[statsUi.bugView === 'total' ? 'active' : 'open'])}" r="5" fill="var(--st-bug)" stroke="var(--rn-card)" stroke-width="2"/>`;
     ov.innerHTML = html;
   });
   const row = (c, l, v) => `<div class="st-tip-r"><span><i style="background:${c}"></i>${l}</span><b>${v}</b></div>`;
   tip.innerHTML = `<div class="st-tip-h">${statsBucketTitle(b, S.gran)}</div>` + row('var(--st-rel)', 'Releases', b.releases) +
-    STATS_SERIES.map(s => row(s.color, s.label, b[s.key])).join('') + row('var(--st-bug)', 'Offene Bugs am Ende', b.open);
+    STATS_SERIES.map(s => row(s.color, s.label, b[s.key])).join('') + row('var(--st-bug)', 'Bugs im Zeitabschnitt', b.active) + row('var(--st-bug)', 'Offene Bugs am Ende', b.open);
   tip.hidden = false;
   const tw = tip.offsetWidth;
   tip.style.left = Math.max(0, x + 14 + tw > P.W ? x - 14 - tw : x + 14) + 'px';
   tip.style.top = '8px';
 }
 function statsTable(S) {
-  stEl('st-tbl').innerHTML = '<table><thead><tr><th>Zeitabschnitt</th><th>Releases</th><th>Features</th><th>Änderungen</th><th>Neue Bugs</th><th>Offen am Ende</th></tr></thead><tbody>' +
-    S.buckets.map(b => `<tr><td>${statsBucketTitle(b, S.gran)}</td><td>${b.releases}</td><td>${b.features}</td><td>${b.changes}</td><td>${b.bugs}</td><td>${b.open}</td></tr>`).join('') + '</tbody></table>';
+  stEl('st-tbl').innerHTML = '<table><thead><tr><th>Zeitabschnitt</th><th>Releases</th><th>Features</th><th>Änderungen</th><th>Neue Bugs</th><th>Bugs gesamt</th><th>Offen am Ende</th></tr></thead><tbody>' +
+    S.buckets.map(b => `<tr><td>${statsBucketTitle(b, S.gran)}</td><td>${b.releases}</td><td>${b.features}</td><td>${b.changes}</td><td>${b.bugs}</td><td>${b.active}</td><td>${b.open}</td></tr>`).join('') + '</tbody></table>';
 }
 
 function showModal(t){document.getElementById('modal').classList.add('active');document.getElementById('modal').dataset.type=t;renderModal()}
@@ -1057,10 +1077,10 @@ document.getElementById('search-input').addEventListener('input',e=>{state.searc
 document.getElementById('category-filter').addEventListener('change',e=>{state.filterCategory=e.target.value;render()});
 // Einzige Quelle für die Admin-Version dieser Datei. Nur erhöhen, wenn an
 // DIESER Datei etwas geändert wurde (unabhängig von der Backend-Version).
-const ADMIN_VERSION = '0.8.0';
-document.title = 'Home Assistant Release Notes Manager - Admin v' + ADMIN_VERSION;
+const ADMIN_VERSION = '0.8.1';
+document.title = 'Release Notes Manager - Admin v' + ADMIN_VERSION;
 document.getElementById('version-meta').setAttribute('content', ADMIN_VERSION);
-console.log('🚀 Home Assistant Release Notes Manager (Admin v' + ADMIN_VERSION + ') startet...');
+console.log('🚀 Release Notes Manager (Admin v' + ADMIN_VERSION + ') startet...');
 
 // Auto-Reload bei Version-Mismatch (v0.5.1+)
 async function checkVersionAndReload() {
@@ -1111,7 +1131,7 @@ checkVersionAndReload().then(reloading => {
 
   <!-- Versions-Anzeige -->
   <div id="version-footer" class="version-footer">
-    Admin: v0.8.0
+    Admin: v0.8.1
   </div>
 </body>
 </html>

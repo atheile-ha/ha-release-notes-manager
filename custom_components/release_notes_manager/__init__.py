@@ -23,7 +23,7 @@ _LOGGER = logging.getLogger(__name__)
 # jedem Release. manifest.json führt zusätzlich die übergreifende
 # Paket-/Release-Version (für HACS), die auch die Dashboard-Karte verwendet.
 BACKEND_VERSION = "0.8.0"   # __init__.py, api.py, storage.py, update_tracker.py, versioning.py, websocket.py
-ADMIN_VERSION = "0.8.0"     # release-notes.html (Eingabe-Dashboard)
+ADMIN_VERSION = "0.8.1"     # release-notes.html (Eingabe-Dashboard)
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """

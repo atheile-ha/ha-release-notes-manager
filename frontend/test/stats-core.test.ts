@@ -14,6 +14,7 @@ interface Bucket {
   changes: number;
   bugs: number;
   open: number;
+  active: number;
 }
 interface Core {
   DAY: number;
@@ -104,6 +105,16 @@ describe("computeStats", () => {
     const early = stats(releases, "2026-09-01", "2026-10-28", "day");
     expect(early.buckets[9].open).toBe(1);
     expect(early.buckets[19].open).toBe(2);
+  });
+
+  it("zählt als Bugs im Zeitabschnitt alle, die dort zu irgendeinem Zeitpunkt offen waren", () => {
+    const s = stats(releases, "2026-09-01", "2026-10-28", "month");
+    // September: 100 und 101. Oktober: 100 (am 05.10. gelöst, aber im Oktober offen gewesen) und 101
+    expect(s.buckets.map((b) => b.active)).toEqual([2, 2]);
+    expect(s.buckets.map((b) => b.open)).toEqual([2, 1]);
+    // Im Folgemonat ist 100 gelöst und zählt nicht mehr mit
+    const later = stats(releases, "2026-09-01", "2026-11-10", "month");
+    expect(later.buckets[2]).toMatchObject({ active: 1, open: 1 });
   });
 
   it("zählt ein Known Issue, das schon beim ersten Auftreten gelöst ist, als neu aber nie offen", () => {

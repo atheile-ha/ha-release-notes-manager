@@ -1,11 +1,6 @@
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/atheile-ha/ha-release-notes-manager/main/custom_components/release_notes_manager/brand/dark_logo@2x.png">
-    <img src="https://raw.githubusercontent.com/atheile-ha/ha-release-notes-manager/main/custom_components/release_notes_manager/brand/logo@2x.png" alt="Release Notes Manager" width="420">
-  </picture>
-</p>
+![Release Notes Manager](https://raw.githubusercontent.com/atheile-ha/ha-release-notes-manager/main/assets/readme-icon.png)
 
-# Home Assistant Release Notes Manager
+# Release Notes Manager
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 
@@ -19,27 +14,20 @@ Ein elegantes Tool zur Verwaltung und Anzeige von Release Notes direkt in Home A
 - 🖥️ **Dashboard-Karte** (`custom:release-notes-card`) - Kompakte Anzeige der neuesten Releases, aktualisiert sich sofort nach jedem Speichern
 - 🌓 **Light/Dark Mode** - Folgt dem aktiven Home-Assistant-Theme, im Admin-Interface manuell umschaltbar
 - 📊 **Statistik** - Zeitverlauf von Releases, Features, Änderungen und Bugs im Admin-Interface, filterbar nach Kategorie
+- 🏷️ **Versionsschema einstellbar** - `YYYY.MM.ZZ` oder `xx.yy.zz`, gilt auch für die automatische Update-Dokumentation; bei `YYYY.MM.ZZ` optional mit vorausgefüllter nächster Nummer
 - 🔍 **Suche & Filter** - Schnell das richtige Release finden
 - 🔄 **Immer aktuell** - Karte und Seiten werden nach einem Update ohne manuelles Cache-Leeren neu geladen
 - 🔧 **Einstellungen** - Popup im Admin-Interface, u.a. mit Export/Import des Datenstands als JSON
 - 🖱️ **Drag'n'Drop** - Einträge im Admin-Interface zwischen "Neue Features" und "Änderungen/Bugfixes" verschieben und innerhalb eines Bereichs umsortieren
 - 🔄 **Automatische Update-Dokumentation** - Beobachtet alle `update.*`-Entitäten der Instanz und legt bei abgeschlossenen Updates sowie neu hinzugekommenen/entfernten Integrationen automatisch passende Release-Notes-Einträge an (ein-/ausschaltbar in den Einstellungen)
 
-## 🆕 Version 0.8.0
+## 🆕 Version 0.8.1
 
-### Neu in dieser Version:
+### Bugfixes im Statistik-Popup:
 
-✅ **Statistik-Popup im Admin-Interface**
-- Button „Statistik“ zeigt den Zeitverlauf von Releases, Features, Änderungen, neuen Bugs und offenen Bugs
-- Zeitraum und Auflösung (Tag bis Jahr) wählbar, Balken oder Linien, Filter nach Kategorien
-
-✅ **Eigenes Logo**
-- Neues Logo in Admin-Interface, Dashboard-Karte, README sowie in der Integrationsliste von Home Assistant und HACS (ab Home Assistant 2026.3)
-
-✅ **Versionsschema einstellbar**
-- Unter **Einstellungen → Versionsschema**: `YYYY.MM.ZZ` (Jahr.Monat.Zähler) oder `xx.yy.zz` (Major.Minor.Bugfix)
-- Das gewählte Schema gilt auch für die automatische Update-Dokumentation: Bei `YYYY.MM.ZZ` zählt der Zähler im Monat weiter, bei `xx.yy.zz` wird Minor erhöht und Bugfix auf 0 gesetzt
-- Bei `YYYY.MM.ZZ` lässt sich per Schalter festlegen, ob neue Releases die nächste Nummer vorausgefüllt bekommen (Standard: aus)
+- Auflösung „Tag“ ist wieder wählbar, „Auto“ entfällt, Standard ist „Woche“
+- Kategorien sind standardmäßig eingeklappt (alle aktiv)
+- Bug-Diagramm umschaltbar zwischen allen Bugs im Zeitraum und offenen Bugs am Ende des Zeitraums
 
 Vollständige Versionshistorie: [CHANGELOG.md](CHANGELOG.md)
 
@@ -201,6 +189,8 @@ npm install
 npm run typecheck && npm test && npm run build
 ```
 
+Die Python-Tests (Versionsschema, Update-Erfassung, Konsistenz von Versionen und Markenbildern) laufen mit `pip install -r requirements-test.txt` und `python -m pytest` im Hauptordner. Beide Testläufe und die Prüfung, dass das eingecheckte Bundle aktuell ist, laufen auch bei jedem Push über GitHub Actions.
+
 ## 🤝 Support
 
 - [GitHub Issues](https://github.com/atheile-ha/ha-release-notes-manager/issues)
@@ -214,5 +204,5 @@ MIT License - siehe [LICENSE](LICENSE)
 
 Entwickelt für die Home Assistant Community 🏠
 
-**Version:** 0.8.0  
+**Version:** 0.8.1  
 **Repository:** https://github.com/atheile-ha/ha-release-notes-manager

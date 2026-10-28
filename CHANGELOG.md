@@ -1,5 +1,24 @@
 # Changelog - Release Notes Manager
 
+## [0.8.1] - 2026-10-28
+
+### 🐛 Bugfixes
+
+**Statistik-Popup**
+- Auflösung „Tag“ ließ sich bei langen Zeiträumen nicht auswählen, jetzt ist sie bis etwa vier Jahre wählbar
+- Die Auswahlzeilen springen beim Umschalten nicht mehr in eine andere Spalte
+- „Auto“ bei der Auflösung entfernt (war doppelt), Standard ist jetzt „Woche“
+- Kategorien sind standardmäßig eingeklappt und alle aktiv; die Auswahl erscheint erst nach dem Aufklappen
+- Neuer Schieberegler beim Bug-Diagramm: „Alle Bugs im Zeitraum“ oder „Offene am Ende des Zeitraums“
+
+### 🔧 Technisch
+
+- Backend-Version: v0.8.0 (unverändert)
+- Admin-Version: v0.8.1 (`release-notes.html`)
+- Karte: unverändert
+
+---
+
 ## [0.8.0] - 2026-10-28
 
 ### 🎉 Neue Features
